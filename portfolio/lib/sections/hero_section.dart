@@ -432,15 +432,6 @@ class _SocialIconState extends State<_SocialIcon> {
   }
 }
 
-class HeroGraphic extends StatefulWidget {
-  final double size;
-
-  const HeroGraphic({super.key, required this.size});
-
-  @override
-  State<HeroGraphic> createState() => _HeroGraphicState();
-}
-
 class _SkillOrbitBadge {
   final String label;
   final IconData icon;
