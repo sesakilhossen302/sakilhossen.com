@@ -105,6 +105,7 @@ class PortfolioImage extends StatelessWidget {
     if (clean.contains(',')) {
       clean = clean.split(',')[1];
     }
+    clean = clean.replaceAll('-', '+').replaceAll('_', '/');
     final remainder = clean.length % 4;
     if (remainder != 0) {
       clean = clean + '=' * (4 - remainder);
@@ -113,13 +114,13 @@ class PortfolioImage extends StatelessWidget {
     return regex.hasMatch(clean);
   }
 
-
   String _getCleanBase64(String str) {
     String clean = str.trim();
     if (clean.contains(',')) {
       clean = clean.split(',')[1];
     }
     clean = clean.replaceAll(RegExp(r'\s+'), '');
+    clean = clean.replaceAll('-', '+').replaceAll('_', '/');
     final remainder = clean.length % 4;
     if (remainder != 0) {
       clean = clean + '=' * (4 - remainder);
