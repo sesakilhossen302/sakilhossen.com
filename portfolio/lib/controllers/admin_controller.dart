@@ -27,7 +27,7 @@ class AdminController extends GetxController {
         Uri.parse('$apiHost/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'password': password}),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -59,7 +59,7 @@ class AdminController extends GetxController {
       final response = await http.get(
         Uri.parse('$apiHost/contact'),
         headers: headers,
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final List data = json.decode(response.body);
@@ -77,7 +77,7 @@ class AdminController extends GetxController {
       final response = await http.delete(
         Uri.parse('$apiHost/contact/$id'),
         headers: headers,
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         inboxMessages.removeWhere((m) => m.id == id);
@@ -98,7 +98,7 @@ class AdminController extends GetxController {
         Uri.parse('$apiHost/portfolio/profile'),
         headers: headers,
         body: json.encode(profile.toJson()),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -120,7 +120,7 @@ class AdminController extends GetxController {
         Uri.parse('$apiHost/projects'),
         headers: headers,
         body: json.encode(project.toJson()),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 201) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -141,7 +141,7 @@ class AdminController extends GetxController {
         Uri.parse('$apiHost/projects/${project.id}'),
         headers: headers,
         body: json.encode(project.toJson()),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -161,7 +161,7 @@ class AdminController extends GetxController {
       final response = await http.delete(
         Uri.parse('$apiHost/projects/$id'),
         headers: headers,
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -183,7 +183,7 @@ class AdminController extends GetxController {
         Uri.parse('$apiHost/references'),
         headers: headers,
         body: json.encode(ref.toJson()),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 201) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -204,7 +204,7 @@ class AdminController extends GetxController {
         Uri.parse('$apiHost/references/${ref.id}'),
         headers: headers,
         body: json.encode(ref.toJson()),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -224,7 +224,7 @@ class AdminController extends GetxController {
       final response = await http.delete(
         Uri.parse('$apiHost/references/$id'),
         headers: headers,
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -248,7 +248,7 @@ class AdminController extends GetxController {
         body: json.encode({
           'skills': skillsList.map((s) => s.toJson()).toList(),
         }),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -271,7 +271,7 @@ class AdminController extends GetxController {
         body: json.encode({
           'experience': expList.map((e) => e.toJson()).toList(),
         }),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -294,7 +294,7 @@ class AdminController extends GetxController {
         body: json.encode({
           'education': eduList.map((e) => e.toJson()).toList(),
         }),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();
@@ -317,7 +317,7 @@ class AdminController extends GetxController {
         body: json.encode({
           'aiWorkflow': aiList.map((e) => e.toJson()).toList(),
         }),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();

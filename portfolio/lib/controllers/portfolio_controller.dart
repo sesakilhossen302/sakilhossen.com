@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/portfolio_models.dart';
 import '../models/project_model.dart';
 import '../theme/portfolio_theme.dart';
 
 class PortfolioController extends GetxController {
   static const String apiHost = 'https://global-standard-portfolio-website-backend.onrender.com/api';
+  static const String _cacheKey = 'cached_portfolio_data_v1';
 
   // Observable portfolio data
   final Rxn<Profile> profile = Rxn<Profile>();
@@ -33,13 +35,52 @@ class PortfolioController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchPortfolioData();
+    _initializeData();
     // Monitor scroll changes to update active section index
     scrollController.addListener(_onScroll);
     // Poll the backend for live updates every 15 seconds silently
     _pollingTimer = Timer.periodic(const Duration(seconds: 15), (_) {
       fetchPortfolioData(isSilent: true);
     });
+  }
+
+  Future<void> _initializeData() async {
+    // 1. Try loading cached live data first for instant UI response
+    bool hasCache = await _loadFromCache();
+
+    if (hasCache) {
+      // Cached real data is displayed immediately; update silently in background
+      isLoading.value = false;
+      fetchPortfolioData(isSilent: true);
+    } else {
+      // No cache found. Keep loading indicator active while fetching from network
+      isLoading.value = true;
+      await fetchPortfolioData(isSilent: false);
+    }
+  }
+
+  Future<bool> _loadFromCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedString = prefs.getString(_cacheKey);
+      if (cachedString != null && cachedString.isNotEmpty) {
+        final data = json.decode(cachedString);
+        _parseData(data);
+        return true;
+      }
+    } catch (e) {
+      print('Error loading cached portfolio data: $e');
+    }
+    return false;
+  }
+
+  Future<void> _saveToCache(String rawJson) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_cacheKey, rawJson);
+    } catch (e) {
+      print('Error saving portfolio cache: $e');
+    }
   }
 
   @override
@@ -90,32 +131,43 @@ class PortfolioController extends GetxController {
     }
   }
 
-  // Fetch portfolio data from Node.js or load fallback offline data
+  // Fetch portfolio data from Node.js with retries and extended Render cold-start timeout
   Future<void> fetchPortfolioData({bool isSilent = false}) async {
-    if (!isSilent) {
+    if (!isSilent && profile.value == null) {
       isLoading.value = true;
     }
-    try {
-      final response = await http.get(Uri.parse('$apiHost/portfolio')).timeout(
-        const Duration(seconds: 3),
-      );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        _parseData(data);
-      } else if (!isSilent) {
-        _loadOfflineFallback();
+    int maxAttempts = 3;
+    bool success = false;
+
+    for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        final response = await http.get(Uri.parse('$apiHost/portfolio')).timeout(
+          const Duration(seconds: 15), // Extended to 15s to allow Render free tier cold-start
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          _parseData(data);
+          _saveToCache(response.body);
+          success = true;
+          break; // Exit loop on successful fetch
+        }
+      } catch (e) {
+        print('Fetch portfolio data attempt $attempt/$maxAttempts failed: $e');
+        if (attempt < maxAttempts) {
+          await Future.delayed(const Duration(seconds: 2));
+        }
       }
-    } catch (e) {
-      // Network error or timeout - fallback to offline data
-      print('Fetch portfolio data failed, loading offline fallback: $e');
-      if (!isSilent) {
-        _loadOfflineFallback();
-      }
-    } finally {
-      if (!isSilent) {
-        isLoading.value = false;
-      }
+    }
+
+    if (!success && profile.value == null && !isSilent) {
+      // Only fall back to offline data if network requests failed AND no cached data is present
+      _loadOfflineFallback();
+    }
+
+    if (!isSilent) {
+      isLoading.value = false;
     }
   }
 
