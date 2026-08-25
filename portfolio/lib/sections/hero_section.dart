@@ -25,13 +25,11 @@ class HeroSection extends StatelessWidget {
       final profile = controller.profile.value;
       final isDark = controller.isDarkMode.value;
 
-      final name = profile?.name ?? "Sakil Hossen";
-      final title = profile?.title ?? "Flutter Mobile Application Developer";
-      final tagline = profile?.tagline ?? "Available for Hire & Projects";
-      final bio =
-          profile?.bio ??
-          "I design and build ultra-premium, high-performance, and responsive applications across Android, iOS, and Web. Passionate about beautiful UI/UX, micro-animations, and clean architecture.";
-      final cvUrl = profile?.cvUrl ?? "https://github.com/sakil";
+      final name = profile?.name ?? "";
+      final title = profile?.title ?? "";
+      final tagline = profile?.tagline ?? "";
+      final bio = profile?.bio ?? "";
+      final cvUrl = profile?.cvUrl ?? "";
 
       return Container(
         constraints: BoxConstraints(
@@ -55,7 +53,7 @@ class HeroSection extends StatelessWidget {
                 tagline: tagline,
                 bio: bio,
                 cvUrl: cvUrl,
-                email: profile?.email ?? 'sakil@example.com',
+                email: profile?.email ?? '',
                 onContactTap: onContactTap,
                 alignCenter: true,
                 isDark: isDark,
@@ -74,7 +72,7 @@ class HeroSection extends StatelessWidget {
                   tagline: tagline,
                   bio: bio,
                   cvUrl: cvUrl,
-                  email: profile?.email ?? 'sakil@example.com',
+                  email: profile?.email ?? '',
                   onContactTap: onContactTap,
                   alignCenter: false,
                   isDark: isDark,
@@ -134,10 +132,10 @@ class _HeroTextContent extends StatelessWidget {
     final profile = controller.profile.value;
     final githubUrl = profile?.githubUrl.isNotEmpty == true
         ? profile!.githubUrl
-        : 'https://github.com/sakil';
+        : '';
     final linkedinUrl = profile?.linkedinUrl.isNotEmpty == true
         ? profile!.linkedinUrl
-        : 'https://linkedin.com';
+        : '';
     final alignment = alignCenter
         ? CrossAxisAlignment.center
         : CrossAxisAlignment.start;

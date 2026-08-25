@@ -14,6 +14,8 @@ import '../sections/contact_section.dart';
 import '../sections/footer_section.dart';
 import '../theme/portfolio_theme.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -27,6 +29,36 @@ class HomeScreen extends StatelessWidget {
     return Obx(() {
       final isDark = controller.isDarkMode.value;
       final showFab = controller.activeSectionIndex.value > 0;
+
+      if (controller.isLoading.value && controller.profile.value == null) {
+        return Scaffold(
+          backgroundColor: isDark ? PortfolioTheme.bgDark : PortfolioTheme.bgLight,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(PortfolioTheme.primary),
+                    strokeWidth: 3,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  "Loading Portfolio...",
+                  style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    color: isDark ? Colors.white70 : PortfolioTheme.secondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
 
       return Scaffold(
         endDrawer: const MobileDrawer(),

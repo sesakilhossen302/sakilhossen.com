@@ -19,7 +19,7 @@ class AboutSection extends StatelessWidget {
       final profile = controller.profile.value;
       final isDark = controller.isDarkMode.value;
 
-      final bio = profile?.bio ?? "Hello! My name is Sakil. I am a highly motivated software developer based in Bangladesh, specializing in crafting premium mobile and web applications. My coding journey revolves around Flutter & Dart, where I transform ideas into seamless, fully-functional digital experiences.";
+      final bio = profile?.bio ?? "";
       final philosophy = profile?.developmentPhilosophy ?? "I place a strong emphasis on clean code architecture (like Clean Architecture or MVC/MVVM), pixel-perfect UI designs, interactive animations, and stellar app performance. Whether it is a web platform, a mobile utility, or an API integration, I strive for excellence in every project.";
       final goals = profile?.careerGoals ?? "To build scalable, robust mobile apps that run globally and collaborate in high-performing international teams.";
       
