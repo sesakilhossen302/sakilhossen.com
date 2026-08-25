@@ -458,17 +458,17 @@ class _HeroGraphicState extends State<HeroGraphic>
   late final AnimationController _controller;
 
   static const List<_SkillOrbitBadge> outerBadges = [
-    _SkillOrbitBadge(label: 'Flutter', icon: FontAwesomeIcons.flutter, color: Color(0xFF42A5F5)),
-    _SkillOrbitBadge(label: 'Android', icon: FontAwesomeIcons.android, color: Color(0xFF3DDC84)),
-    _SkillOrbitBadge(label: 'Firebase', icon: FontAwesomeIcons.fire, color: Color(0xFFFFCA28)),
+    _SkillOrbitBadge(label: 'Flutter', icon: Icons.flutter_dash, color: Color(0xFF42A5F5)),
+    _SkillOrbitBadge(label: 'Android', icon: Icons.android_rounded, color: Color(0xFF3DDC84)),
+    _SkillOrbitBadge(label: 'Firebase', icon: Icons.local_fire_department_rounded, color: Color(0xFFFFCA28)),
     _SkillOrbitBadge(label: 'AI Tech', icon: Icons.auto_awesome_rounded, color: Color(0xFFA855F7)),
     _SkillOrbitBadge(label: 'REST API', icon: Icons.api_rounded, color: Color(0xFF06B6D4)),
   ];
 
   static const List<_SkillOrbitBadge> innerBadges = [
     _SkillOrbitBadge(label: 'Dart', icon: Icons.code_rounded, color: Color(0xFF29B6F6)),
-    _SkillOrbitBadge(label: 'iOS', icon: FontAwesomeIcons.apple, color: Colors.white),
-    _SkillOrbitBadge(label: 'GitHub', icon: FontAwesomeIcons.github, color: Color(0xFFFF7043)),
+    _SkillOrbitBadge(label: 'iOS', icon: Icons.phone_iphone_rounded, color: Colors.white),
+    _SkillOrbitBadge(label: 'GitHub', icon: Icons.terminal_rounded, color: Color(0xFFFF7043)),
     _SkillOrbitBadge(label: 'GetX', icon: Icons.layers_rounded, color: Color(0xFF10B981)),
   ];
 
