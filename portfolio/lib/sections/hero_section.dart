@@ -433,12 +433,12 @@ class _SocialIconState extends State<_SocialIcon> {
 
 class _SkillOrbitBadge {
   final String label;
-  final IconData icon;
+  final String assetPath;
   final Color color;
 
   const _SkillOrbitBadge({
     required this.label,
-    required this.icon,
+    required this.assetPath,
     required this.color,
   });
 }
@@ -457,18 +457,18 @@ class _HeroGraphicState extends State<HeroGraphic>
   late final AnimationController _controller;
 
   static const List<_SkillOrbitBadge> outerBadges = [
-    _SkillOrbitBadge(label: 'Flutter', icon: Icons.flutter_dash, color: Color(0xFF42A5F5)),
-    _SkillOrbitBadge(label: 'Android', icon: Icons.android_rounded, color: Color(0xFF3DDC84)),
-    _SkillOrbitBadge(label: 'Firebase', icon: Icons.local_fire_department_rounded, color: Color(0xFFFFCA28)),
-    _SkillOrbitBadge(label: 'AI Tech', icon: Icons.auto_awesome_rounded, color: Color(0xFFA855F7)),
-    _SkillOrbitBadge(label: 'REST API', icon: Icons.api_rounded, color: Color(0xFF06B6D4)),
+    _SkillOrbitBadge(label: 'Flutter', assetPath: 'assets/images/tech/flutter.png', color: Color(0xFF42A5F5)),
+    _SkillOrbitBadge(label: 'Android', assetPath: 'assets/images/tech/android.png', color: Color(0xFF3DDC84)),
+    _SkillOrbitBadge(label: 'Firebase', assetPath: 'assets/images/tech/firebase.png', color: Color(0xFFFFCA28)),
+    _SkillOrbitBadge(label: 'AI Tech', assetPath: 'assets/images/tech/ai.png', color: Color(0xFFA855F7)),
+    _SkillOrbitBadge(label: 'REST API', assetPath: 'assets/images/tech/api.png', color: Color(0xFF06B6D4)),
   ];
 
   static const List<_SkillOrbitBadge> innerBadges = [
-    _SkillOrbitBadge(label: 'Dart', icon: Icons.code_rounded, color: Color(0xFF29B6F6)),
-    _SkillOrbitBadge(label: 'iOS', icon: Icons.phone_iphone_rounded, color: Colors.white),
-    _SkillOrbitBadge(label: 'GitHub', icon: Icons.terminal_rounded, color: Color(0xFFFF7043)),
-    _SkillOrbitBadge(label: 'GetX', icon: Icons.layers_rounded, color: Color(0xFF10B981)),
+    _SkillOrbitBadge(label: 'Dart', assetPath: 'assets/images/tech/dart.png', color: Color(0xFF29B6F6)),
+    _SkillOrbitBadge(label: 'iOS', assetPath: 'assets/images/tech/apple.png', color: Colors.white),
+    _SkillOrbitBadge(label: 'GitHub', assetPath: 'assets/images/tech/github.png', color: Color(0xFFFF7043)),
+    _SkillOrbitBadge(label: 'GetX', assetPath: 'assets/images/tech/getx.png', color: Color(0xFF10B981)),
   ];
 
   @override
@@ -502,7 +502,7 @@ class _HeroGraphicState extends State<HeroGraphic>
           final double baseAngle = _controller.value * 2 * math.pi;
           final double outerRadius = widget.size * 0.40;
           final double innerRadius = widget.size * 0.27;
-          final double badgeSize = widget.size < 200 ? 32.0 : 42.0;
+          final double badgeSize = widget.size < 200 ? 34.0 : 46.0;
 
           final List<Widget> badgeWidgets = [];
 
@@ -522,6 +522,7 @@ class _HeroGraphicState extends State<HeroGraphic>
                   child: Container(
                     width: badgeSize,
                     height: badgeSize,
+                    padding: EdgeInsets.all(badgeSize * 0.2),
                     decoration: BoxDecoration(
                       color: PortfolioTheme.surfaceDark.withOpacity(0.92),
                       shape: BoxShape.circle,
@@ -538,10 +539,14 @@ class _HeroGraphicState extends State<HeroGraphic>
                       ],
                     ),
                     child: Center(
-                      child: Icon(
-                        badge.icon,
-                        size: badgeSize * 0.52,
-                        color: badge.color,
+                      child: Image.asset(
+                        badge.assetPath,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.code_rounded,
+                          size: badgeSize * 0.5,
+                          color: badge.color,
+                        ),
                       ),
                     ),
                   ),
@@ -568,6 +573,7 @@ class _HeroGraphicState extends State<HeroGraphic>
                   child: Container(
                     width: innerBadgeSize,
                     height: innerBadgeSize,
+                    padding: EdgeInsets.all(innerBadgeSize * 0.2),
                     decoration: BoxDecoration(
                       color: PortfolioTheme.bgDark.withOpacity(0.92),
                       shape: BoxShape.circle,
@@ -584,10 +590,14 @@ class _HeroGraphicState extends State<HeroGraphic>
                       ],
                     ),
                     child: Center(
-                      child: Icon(
-                        badge.icon,
-                        size: innerBadgeSize * 0.52,
-                        color: badge.color,
+                      child: Image.asset(
+                        badge.assetPath,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.code_rounded,
+                          size: innerBadgeSize * 0.5,
+                          color: badge.color,
+                        ),
                       ),
                     ),
                   ),
