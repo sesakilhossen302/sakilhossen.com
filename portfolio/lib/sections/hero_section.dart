@@ -441,15 +441,51 @@ class HeroGraphic extends StatefulWidget {
   State<HeroGraphic> createState() => _HeroGraphicState();
 }
 
+class _SkillOrbitBadge {
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  const _SkillOrbitBadge({
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+}
+
+class HeroGraphic extends StatefulWidget {
+  final double size;
+
+  const HeroGraphic({super.key, required this.size});
+
+  @override
+  State<HeroGraphic> createState() => _HeroGraphicState();
+}
+
 class _HeroGraphicState extends State<HeroGraphic>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+
+  static const List<_SkillOrbitBadge> outerBadges = [
+    _SkillOrbitBadge(label: 'Flutter', icon: FontAwesomeIcons.flutter, color: Color(0xFF42A5F5)),
+    _SkillOrbitBadge(label: 'Android', icon: FontAwesomeIcons.android, color: Color(0xFF3DDC84)),
+    _SkillOrbitBadge(label: 'Firebase', icon: FontAwesomeIcons.fire, color: Color(0xFFFFCA28)),
+    _SkillOrbitBadge(label: 'AI Tech', icon: Icons.auto_awesome_rounded, color: Color(0xFFA855F7)),
+    _SkillOrbitBadge(label: 'REST API', icon: Icons.api_rounded, color: Color(0xFF06B6D4)),
+  ];
+
+  static const List<_SkillOrbitBadge> innerBadges = [
+    _SkillOrbitBadge(label: 'Dart', icon: Icons.code_rounded, color: Color(0xFF29B6F6)),
+    _SkillOrbitBadge(label: 'iOS', icon: FontAwesomeIcons.apple, color: Colors.white),
+    _SkillOrbitBadge(label: 'GitHub', icon: FontAwesomeIcons.github, color: Color(0xFFFF7043)),
+    _SkillOrbitBadge(label: 'GetX', icon: Icons.layers_rounded, color: Color(0xFF10B981)),
+  ];
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 12),
+      duration: const Duration(seconds: 16),
       vsync: this,
     )..repeat();
   }
@@ -473,63 +509,166 @@ class _HeroGraphicState extends State<HeroGraphic>
       return AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              // Outer Pulsating Glow
-              Container(
-                width: widget.size * 0.8,
-                height: widget.size * 0.8,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: PortfolioTheme.primary.withOpacity(0.08),
-                      blurRadius: 50,
-                      spreadRadius: 20,
+          final double baseAngle = _controller.value * 2 * math.pi;
+          final double outerRadius = widget.size * 0.40;
+          final double innerRadius = widget.size * 0.27;
+          final double badgeSize = widget.size < 200 ? 32.0 : 42.0;
+
+          final List<Widget> badgeWidgets = [];
+
+          // 1. Outer Orbit Badges (Clockwise)
+          for (int i = 0; i < outerBadges.length; i++) {
+            final badge = outerBadges[i];
+            final angle = baseAngle + (i * 2 * math.pi / outerBadges.length);
+            final x = (widget.size / 2) + outerRadius * math.cos(angle) - (badgeSize / 2);
+            final y = (widget.size / 2) + outerRadius * math.sin(angle) - (badgeSize / 2);
+
+            badgeWidgets.add(
+              Positioned(
+                left: x,
+                top: y,
+                child: Tooltip(
+                  message: badge.label,
+                  child: Container(
+                    width: badgeSize,
+                    height: badgeSize,
+                    decoration: BoxDecoration(
+                      color: PortfolioTheme.surfaceDark.withOpacity(0.92),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: badge.color.withOpacity(0.7),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: badge.color.withOpacity(0.35),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              // Custom Painter Drawing Cyber Orb
-              CustomPaint(
-                size: Size(widget.size, widget.size),
-                painter: CyberOrbPainter(
-                  rotationValue: _controller.value,
-                  primaryColor: PortfolioTheme.primary,
-                  accentColor: PortfolioTheme.accent,
-                  secondaryColor: const Color(0xFF10B981),
-                ),
-              ),
-              // Center Element / Icon / Profile Image
-              Container(
-                width: widget.size * 0.35,
-                height: widget.size * 0.35,
-                decoration: BoxDecoration(
-                  color: PortfolioTheme.surfaceDark.withOpacity(0.85),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: PortfolioTheme.primary.withOpacity(0.4),
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                    child: Center(
+                      child: Icon(
+                        badge.icon,
+                        size: badgeSize * 0.52,
+                        color: badge.color,
+                      ),
                     ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: PortfolioImage(
-                    imageSource: imgSource,
-                    width: widget.size * 0.35,
-                    height: widget.size * 0.35,
-                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-            ],
+            );
+          }
+
+          // 2. Inner Orbit Badges (Counter-Clockwise)
+          final double innerAngle = -baseAngle * 1.3;
+          final double innerBadgeSize = badgeSize * 0.88;
+          for (int j = 0; j < innerBadges.length; j++) {
+            final badge = innerBadges[j];
+            final angle = innerAngle + (j * 2 * math.pi / innerBadges.length);
+            final x = (widget.size / 2) + innerRadius * math.cos(angle) - (innerBadgeSize / 2);
+            final y = (widget.size / 2) + innerRadius * math.sin(angle) - (innerBadgeSize / 2);
+
+            badgeWidgets.add(
+              Positioned(
+                left: x,
+                top: y,
+                child: Tooltip(
+                  message: badge.label,
+                  child: Container(
+                    width: innerBadgeSize,
+                    height: innerBadgeSize,
+                    decoration: BoxDecoration(
+                      color: PortfolioTheme.bgDark.withOpacity(0.92),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: badge.color.withOpacity(0.7),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: badge.color.withOpacity(0.35),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Icon(
+                        badge.icon,
+                        size: innerBadgeSize * 0.52,
+                        color: badge.color,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return SizedBox(
+            width: widget.size,
+            height: widget.size,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Outer Pulsating Glow
+                Container(
+                  width: widget.size * 0.8,
+                  height: widget.size * 0.8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: PortfolioTheme.primary.withOpacity(0.08),
+                        blurRadius: 50,
+                        spreadRadius: 20,
+                      ),
+                    ],
+                  ),
+                ),
+                // Custom Painter Drawing Cyber Orb Rings
+                CustomPaint(
+                  size: Size(widget.size, widget.size),
+                  painter: CyberOrbPainter(
+                    rotationValue: _controller.value,
+                    primaryColor: PortfolioTheme.primary,
+                    accentColor: PortfolioTheme.accent,
+                    secondaryColor: const Color(0xFF10B981),
+                  ),
+                ),
+                // Orbiting Tech Skill Icons
+                ...badgeWidgets,
+                // Center Element / Profile Image
+                Container(
+                  width: widget.size * 0.35,
+                  height: widget.size * 0.35,
+                  decoration: BoxDecoration(
+                    color: PortfolioTheme.surfaceDark.withOpacity(0.85),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: PortfolioTheme.primary.withOpacity(0.4),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: PortfolioImage(
+                      imageSource: imgSource,
+                      width: widget.size * 0.35,
+                      height: widget.size * 0.35,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       );
