@@ -114,14 +114,6 @@ class PortfolioController extends GetxController {
     }
   }
 
-  @override
-  void onClose() {
-    _pollingTimer?.cancel();
-    scrollController.removeListener(_onScroll);
-    scrollController.dispose();
-    super.onClose();
-  }
-
   void toggleTheme() {
     isDarkMode.value = !isDarkMode.value;
     Get.changeTheme(isDarkMode.value ? PortfolioTheme.darkTheme : PortfolioTheme.lightTheme);
