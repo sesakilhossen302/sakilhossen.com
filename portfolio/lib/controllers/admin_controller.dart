@@ -94,6 +94,9 @@ class AdminController extends GetxController {
   Future<bool> updateProfile(Profile profile) async {
     isSaving.value = true;
     try {
+      if (Get.isRegistered<PortfolioController>()) {
+        Get.find<PortfolioController>().profile.value = profile;
+      }
       final response = await http.put(
         Uri.parse('$apiHost/portfolio/profile'),
         headers: headers,
@@ -101,7 +104,7 @@ class AdminController extends GetxController {
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        Get.find<PortfolioController>().fetchPortfolioData();
+        Get.find<PortfolioController>().fetchPortfolioData(isSilent: true);
         return true;
       }
     } catch (e) {

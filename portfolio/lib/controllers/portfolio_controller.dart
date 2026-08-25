@@ -31,6 +31,7 @@ class PortfolioController extends GetxController {
   final List<GlobalKey> sectionKeys = List.generate(10, (index) => GlobalKey());
   final ScrollController scrollController = ScrollController();
   Timer? _pollingTimer;
+  http.Client? _sseClient;
 
   @override
   void onInit() {
@@ -38,10 +39,40 @@ class PortfolioController extends GetxController {
     _initializeData();
     // Monitor scroll changes to update active section index
     scrollController.addListener(_onScroll);
-    // Poll the backend for live updates every 15 seconds silently
-    _pollingTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+    // Poll backend every 5 seconds for fast updates
+    _pollingTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       fetchPortfolioData(isSilent: true);
     });
+    // Establish real-time SSE listener for 0-second multi-device sync
+    _listenToRealtimeEvents();
+  }
+
+  void _listenToRealtimeEvents() async {
+    try {
+      _sseClient?.close();
+      _sseClient = http.Client();
+      final request = http.Request('GET', Uri.parse('$apiHost/events'));
+      final response = await _sseClient!.send(request);
+
+      response.stream.transform(utf8.decoder).listen((data) {
+        if (data.contains('portfolio_updated')) {
+          fetchPortfolioData(isSilent: true);
+        }
+      }, onError: (e) {
+        print('SSE stream error: $e');
+      });
+    } catch (e) {
+      print('Failed to connect to real-time events SSE stream: $e');
+    }
+  }
+
+  @override
+  void onClose() {
+    _sseClient?.close();
+    _pollingTimer?.cancel();
+    scrollController.removeListener(_onScroll);
+    scrollController.dispose();
+    super.onClose();
   }
 
   Future<void> _initializeData() async {

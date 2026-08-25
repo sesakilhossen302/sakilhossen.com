@@ -20,12 +20,12 @@ class AboutSection extends StatelessWidget {
       final isDark = controller.isDarkMode.value;
 
       final bio = profile?.bio ?? "";
-      final philosophy = profile?.developmentPhilosophy ?? "I place a strong emphasis on clean code architecture (like Clean Architecture or MVC/MVVM), pixel-perfect UI designs, interactive animations, and stellar app performance. Whether it is a web platform, a mobile utility, or an API integration, I strive for excellence in every project.";
-      final goals = profile?.careerGoals ?? "To build scalable, robust mobile apps that run globally and collaborate in high-performing international teams.";
-      
-      final expYears = profile?.experienceYears ?? "3+";
-      final completedProj = profile?.completedProjects ?? "20+";
-      final clientsCount = profile?.happyClients ?? "10+";
+      final philosophy = profile?.developmentPhilosophy ?? "";
+      final goals = profile?.careerGoals ?? "";
+
+      final expYears = profile?.experienceYears ?? "";
+      final completedProj = profile?.completedProjects ?? "";
+      final clientsCount = profile?.happyClients ?? "";
 
       return Container(
         padding: EdgeInsets.symmetric(
@@ -59,14 +59,24 @@ class AboutSection extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 40),
-            
+
             ResponsiveWidget(
               mobile: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _AboutStoryText(bio: bio, philosophy: philosophy, goals: goals, isDark: isDark),
+                  _AboutStoryText(
+                    bio: bio,
+                    philosophy: philosophy,
+                    goals: goals,
+                    isDark: isDark,
+                  ),
                   const SizedBox(height: 40),
-                  _AboutStatsGrid(exp: expYears, proj: completedProj, clients: clientsCount, isDark: isDark),
+                  _AboutStatsGrid(
+                    exp: expYears,
+                    proj: completedProj,
+                    clients: clientsCount,
+                    isDark: isDark,
+                  ),
                 ],
               ),
               desktop: Row(
@@ -74,13 +84,24 @@ class AboutSection extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 4,
-                    child: _AboutStoryText(bio: bio, philosophy: philosophy, goals: goals, isDark: isDark),
+                    child: _AboutStoryText(
+                      bio: bio,
+                      philosophy: philosophy,
+                      goals: goals,
+                      isDark: isDark,
+                    ),
                   ),
                   SizedBox(width: size.width * 0.08),
                   Expanded(
                     flex: 3,
                     child: Center(
-                      child: _AboutStatsGrid(exp: expYears, proj: completedProj, clients: clientsCount, isDark: isDark, verticalLayout: true),
+                      child: _AboutStatsGrid(
+                        exp: expYears,
+                        proj: completedProj,
+                        clients: clientsCount,
+                        isDark: isDark,
+                        verticalLayout: true,
+                      ),
                     ),
                   ),
                 ],
@@ -109,7 +130,7 @@ class _AboutStoryText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -123,12 +144,9 @@ class _AboutStoryText extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        Text(
-          bio,
-          style: textTheme.bodyLarge,
-        ),
+        Text(bio, style: textTheme.bodyLarge),
         const SizedBox(height: 16),
-        
+
         Text(
           "Development Philosophy",
           style: GoogleFonts.outfit(
@@ -138,10 +156,7 @@ class _AboutStoryText extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          philosophy,
-          style: textTheme.bodyLarge,
-        ),
+        Text(philosophy, style: textTheme.bodyLarge),
         const SizedBox(height: 16),
 
         Text(
@@ -153,10 +168,7 @@ class _AboutStoryText extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          goals,
-          style: textTheme.bodyLarge,
-        ),
+        Text(goals, style: textTheme.bodyLarge),
       ],
     );
   }
@@ -253,41 +265,48 @@ class _StatCardState extends State<_StatCard> {
         width: widget.width ?? double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
         decoration: BoxDecoration(
-          color: widget.isDark 
-              ? (_isHovered 
-                  ? PortfolioTheme.primary.withOpacity(0.06) 
-                  : PortfolioTheme.surfaceDark.withOpacity(0.4))
-              : (_isHovered 
-                  ? PortfolioTheme.primary.withOpacity(0.04) 
-                  : PortfolioTheme.surfaceLight),
+          color: widget.isDark
+              ? (_isHovered
+                    ? PortfolioTheme.primary.withOpacity(0.06)
+                    : PortfolioTheme.surfaceDark.withOpacity(0.4))
+              : (_isHovered
+                    ? PortfolioTheme.primary.withOpacity(0.04)
+                    : PortfolioTheme.surfaceLight),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _isHovered 
-                ? PortfolioTheme.primary.withOpacity(0.4) 
-                : (widget.isDark ? PortfolioTheme.borderDark : PortfolioTheme.borderLight),
+            color: _isHovered
+                ? PortfolioTheme.primary.withOpacity(0.4)
+                : (widget.isDark
+                      ? PortfolioTheme.borderDark
+                      : PortfolioTheme.borderLight),
             width: 1.2,
           ),
-          boxShadow: _isHovered ? [
-            BoxShadow(
-              color: PortfolioTheme.primary.withOpacity(0.05),
-              blurRadius: 15,
-              spreadRadius: 1,
-            )
-          ] : (widget.isDark ? [] : [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ]),
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    color: PortfolioTheme.primary.withOpacity(0.05),
+                    blurRadius: 15,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : (widget.isDark
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.02),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ShaderMask(
-              shaderCallback: (bounds) => PortfolioTheme.primaryGradient.createShader(
-                Rect.fromLTWH(0, 0, bounds.width, bounds.height),
-              ),
+              shaderCallback: (bounds) =>
+                  PortfolioTheme.primaryGradient.createShader(
+                    Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                  ),
               child: Text(
                 widget.number,
                 style: GoogleFonts.outfit(
@@ -304,7 +323,9 @@ class _StatCardState extends State<_StatCard> {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                color: widget.isDark
+                    ? const Color(0xFF94A3B8)
+                    : const Color(0xFF475569),
                 height: 1.3,
               ),
             ),
