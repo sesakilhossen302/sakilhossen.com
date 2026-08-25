@@ -464,70 +464,76 @@ class _HeroGraphicState extends State<HeroGraphic>
   Widget build(BuildContext context) {
     final controller = Get.find<PortfolioController>();
 
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            // Outer Pulsating Glow
-            Container(
-              width: widget.size * 0.8,
-              height: widget.size * 0.8,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: PortfolioTheme.primary.withOpacity(0.08),
-                    blurRadius: 50,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-            ),
-            // Custom Painter Drawing Cyber Orb
-            CustomPaint(
-              size: Size(widget.size, widget.size),
-              painter: CyberOrbPainter(
-                rotationValue: _controller.value,
-                primaryColor: PortfolioTheme.primary,
-                accentColor: PortfolioTheme.accent,
-                secondaryColor: const Color(0xFF10B981),
-              ),
-            ),
-            // Center Element / Icon / Profile Image
-            Container(
-              width: widget.size * 0.35,
-              height: widget.size * 0.35,
-              decoration: BoxDecoration(
-                color: PortfolioTheme.surfaceDark.withOpacity(0.85),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: PortfolioTheme.primary.withOpacity(0.4),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: PortfolioImage(
-                  imageSource:
-                      'assets/images/696179481_1503014734869412_8236696213527085729_n.jpg',
-                  width: widget.size * 0.35,
-                  height: widget.size * 0.35,
-                  fit: BoxFit.cover,
+    return Obx(() {
+      final profileImg = controller.profile.value?.profileImage ?? '';
+      final imgSource = profileImg.isNotEmpty
+          ? profileImg
+          : 'assets/images/696179481_1503014734869412_8236696213527085729_n.jpg';
+
+      return AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              // Outer Pulsating Glow
+              Container(
+                width: widget.size * 0.8,
+                height: widget.size * 0.8,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: PortfolioTheme.primary.withOpacity(0.08),
+                      blurRadius: 50,
+                      spreadRadius: 20,
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
-        );
-      },
-    );
+              // Custom Painter Drawing Cyber Orb
+              CustomPaint(
+                size: Size(widget.size, widget.size),
+                painter: CyberOrbPainter(
+                  rotationValue: _controller.value,
+                  primaryColor: PortfolioTheme.primary,
+                  accentColor: PortfolioTheme.accent,
+                  secondaryColor: const Color(0xFF10B981),
+                ),
+              ),
+              // Center Element / Icon / Profile Image
+              Container(
+                width: widget.size * 0.35,
+                height: widget.size * 0.35,
+                decoration: BoxDecoration(
+                  color: PortfolioTheme.surfaceDark.withOpacity(0.85),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: PortfolioTheme.primary.withOpacity(0.4),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: PortfolioImage(
+                    imageSource: imgSource,
+                    width: widget.size * 0.35,
+                    height: widget.size * 0.35,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    });
   }
 }
 
