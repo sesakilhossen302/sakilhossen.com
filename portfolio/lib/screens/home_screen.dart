@@ -61,6 +61,7 @@ class HomeScreen extends StatelessWidget {
       }
 
       return Scaffold(
+        extendBodyBehindAppBar: true,
         endDrawer: const MobileDrawer(),
         appBar: const Navbar(),
         body: Stack(

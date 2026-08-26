@@ -25,11 +25,11 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
         height: 80,
         decoration: BoxDecoration(
           color: isDark 
-              ? PortfolioTheme.bgDark.withOpacity(0.7) 
-              : PortfolioTheme.bgLight.withOpacity(0.7),
+              ? PortfolioTheme.bgDark.withOpacity(0.45) 
+              : PortfolioTheme.bgLight.withOpacity(0.45),
           border: Border(
             bottom: BorderSide(
-              color: isDark ? PortfolioTheme.borderDark : PortfolioTheme.borderLight,
+              color: (isDark ? PortfolioTheme.borderDark : PortfolioTheme.borderLight).withOpacity(0.3),
               width: 1,
             ),
           ),

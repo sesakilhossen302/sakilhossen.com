@@ -56,9 +56,11 @@ class HeroSection extends StatelessWidget {
               minHeight: isMobile ? size.height * 0.75 : size.height * 0.85,
             ),
             alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(
-              horizontal: isDesktop ? size.width * 0.08 : 24.0,
-              vertical: 60.0,
+            padding: EdgeInsets.only(
+              left: isDesktop ? size.width * 0.08 : 24.0,
+              right: isDesktop ? size.width * 0.08 : 24.0,
+              top: isMobile ? 110.0 : 130.0,
+              bottom: 60.0,
             ),
             child: ResponsiveWidget(
               mobile: Column(
