@@ -96,11 +96,20 @@ class AdminController extends GetxController {
     isSaving.value = true;
     try {
       final base64Video = 'data:$mimeType;base64,${base64Encode(videoBytes)}';
-      final response = await http.post(
+      
+      var response = await http.post(
         Uri.parse('$apiHost/upload/video'),
         headers: headers,
         body: json.encode({'videoData': base64Video}),
       ).timeout(const Duration(seconds: 180));
+
+      if (response.statusCode == 404) {
+        response = await http.post(
+          Uri.parse('$apiHost/portfolio/upload-video'),
+          headers: headers,
+          body: json.encode({'videoData': base64Video}),
+        ).timeout(const Duration(seconds: 180));
+      }
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

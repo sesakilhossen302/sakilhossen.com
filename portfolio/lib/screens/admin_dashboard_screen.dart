@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -601,11 +602,17 @@ class _ProfileTabState extends State<_ProfileTab> {
                             colorText: Colors.white,
                           );
                         } else {
+                          final base64Video = 'data:${picked.mimeType};base64,${base64Encode(picked.bytes)}';
+                          setState(() {
+                            _uploadedVideoBase64 = base64Video;
+                            _heroVideoUrlCtrl.text = '[Uploaded Video File: $sizeMb MB]';
+                          });
                           Get.snackbar(
-                            'Upload Failed',
-                            'Failed to upload video to server. Please try again.',
-                            backgroundColor: Colors.redAccent,
+                            'Video File Loaded ($sizeMb MB)',
+                            'Video ready. Click Save Details below to save and update background.',
+                            backgroundColor: Colors.deepOrange,
                             colorText: Colors.white,
+                            duration: const Duration(seconds: 5),
                           );
                         }
                       }
