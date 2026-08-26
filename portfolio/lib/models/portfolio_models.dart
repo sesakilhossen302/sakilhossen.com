@@ -15,6 +15,7 @@ class Profile {
   final String location;
   final String githubUrl;
   final String linkedinUrl;
+  final String heroVideoUrl;
 
   const Profile({
     required this.name,
@@ -33,6 +34,7 @@ class Profile {
     required this.location,
     required this.githubUrl,
     required this.linkedinUrl,
+    this.heroVideoUrl = '',
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,7 @@ class Profile {
       location: json['location'] ?? '',
       githubUrl: json['githubUrl'] ?? '',
       linkedinUrl: json['linkedinUrl'] ?? '',
+      heroVideoUrl: json['heroVideoUrl'] ?? '',
     );
   }
 
@@ -74,6 +77,7 @@ class Profile {
       'location': location,
       'githubUrl': githubUrl,
       'linkedinUrl': linkedinUrl,
+      'heroVideoUrl': heroVideoUrl,
     };
   }
 }

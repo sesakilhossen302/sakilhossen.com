@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 import '../controllers/portfolio_controller.dart';
 import '../theme/portfolio_theme.dart';
 import '../widgets/responsive_widget.dart';
@@ -29,65 +30,87 @@ class HeroSection extends StatelessWidget {
       final tagline = profile?.tagline ?? "";
       final bio = profile?.bio ?? "";
       final cvUrl = profile?.cvUrl ?? "";
+      final heroVideoUrl = profile?.heroVideoUrl ?? "";
 
-      return Container(
-        constraints: BoxConstraints(
-          minHeight: isMobile ? size.height * 0.75 : size.height * 0.85,
-        ),
+      return Stack(
+        clipBehavior: Clip.hardEdge,
         alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(
-          horizontal: isDesktop ? size.width * 0.08 : 24.0,
-          vertical: 60.0,
-        ),
-        child: ResponsiveWidget(
-          mobile: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              HeroGraphic(size: isMobile ? 180 : 260),
-              const SizedBox(height: 40),
-              _HeroTextContent(
-                name: name,
-                title: title,
-                tagline: tagline,
-                bio: bio,
-                cvUrl: cvUrl,
-                email: profile?.email ?? '',
-                onContactTap: onContactTap,
-                alignCenter: true,
-                isDark: isDark,
+        children: [
+          // 1. Ambient Background Video Player Layer
+          if (heroVideoUrl.isNotEmpty)
+            Positioned.fill(
+              child: _BackgroundVideoPlayer(videoUrl: heroVideoUrl),
+            ),
+
+          // 2. Dark Overlay for High Text Readability
+          if (heroVideoUrl.isNotEmpty)
+            Positioned.fill(
+              child: Container(
+                color: (isDark ? Colors.black : Colors.black87).withOpacity(0.65),
               ),
-            ],
-          ),
-          desktop: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 4,
-                child: _HeroTextContent(
-                  name: name,
-                  title: title,
-                  tagline: tagline,
-                  bio: bio,
-                  cvUrl: cvUrl,
-                  email: profile?.email ?? '',
-                  onContactTap: onContactTap,
-                  alignCenter: false,
-                  isDark: isDark,
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Center(
-                  child: HeroGraphic(
-                    size: size.width * 0.22 > 320 ? size.width * 0.22 : 320,
+            ),
+
+          // 3. Main Hero Section Content
+          Container(
+            constraints: BoxConstraints(
+              minHeight: isMobile ? size.height * 0.75 : size.height * 0.85,
+            ),
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(
+              horizontal: isDesktop ? size.width * 0.08 : 24.0,
+              vertical: 60.0,
+            ),
+            child: ResponsiveWidget(
+              mobile: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  HeroGraphic(size: isMobile ? 180 : 260),
+                  const SizedBox(height: 40),
+                  _HeroTextContent(
+                    name: name,
+                    title: title,
+                    tagline: tagline,
+                    bio: bio,
+                    cvUrl: cvUrl,
+                    email: profile?.email ?? '',
+                    onContactTap: onContactTap,
+                    alignCenter: true,
+                    isDark: isDark,
                   ),
-                ),
+                ],
               ),
-            ],
+              desktop: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: _HeroTextContent(
+                      name: name,
+                      title: title,
+                      tagline: tagline,
+                      bio: bio,
+                      cvUrl: cvUrl,
+                      email: profile?.email ?? '',
+                      onContactTap: onContactTap,
+                      alignCenter: false,
+                      isDark: isDark,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Center(
+                      child: HeroGraphic(
+                        size: size.width * 0.22 > 320 ? size.width * 0.22 : 320,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       );
     });
   }
@@ -791,5 +814,86 @@ class CyberOrbPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CyberOrbPainter oldDelegate) {
     return oldDelegate.rotationValue != rotationValue;
+  }
+}
+
+class _BackgroundVideoPlayer extends StatefulWidget {
+  final String videoUrl;
+
+  const _BackgroundVideoPlayer({required this.videoUrl});
+
+  @override
+  State<_BackgroundVideoPlayer> createState() => _BackgroundVideoPlayerState();
+}
+
+class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
+  VideoPlayerController? _controller;
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initVideo();
+  }
+
+  @override
+  void didUpdateWidget(covariant _BackgroundVideoPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.videoUrl != widget.videoUrl) {
+      _disposeVideo();
+      _initVideo();
+    }
+  }
+
+  void _initVideo() async {
+    final url = widget.videoUrl.trim();
+    if (url.isEmpty) return;
+
+    try {
+      final uri = Uri.parse(url);
+      _controller = VideoPlayerController.networkUrl(uri)
+        ..setVolume(0.0)
+        ..setLooping(true);
+
+      await _controller!.initialize();
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+        });
+        _controller!.play();
+      }
+    } catch (e) {
+      debugPrint('Background video initialization failed: $e');
+    }
+  }
+
+  void _disposeVideo() {
+    _controller?.pause();
+    _controller?.dispose();
+    _controller = null;
+    _isInitialized = false;
+  }
+
+  @override
+  void dispose() {
+    _disposeVideo();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isInitialized || _controller == null) {
+      return const SizedBox.shrink();
+    }
+
+    return FittedBox(
+      fit: BoxFit.cover,
+      clipBehavior: Clip.hardEdge,
+      child: SizedBox(
+        width: _controller!.value.size.width,
+        height: _controller!.value.size.height,
+        child: VideoPlayer(_controller!),
+      ),
+    );
   }
 }

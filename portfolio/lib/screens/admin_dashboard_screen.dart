@@ -299,6 +299,7 @@ class _ProfileTabState extends State<_ProfileTab> {
   late TextEditingController _locationCtrl;
   late TextEditingController _githubUrlCtrl;
   late TextEditingController _linkedinUrlCtrl;
+  late TextEditingController _heroVideoUrlCtrl;
   String _profileImage = '';
 
   @override
@@ -321,6 +322,7 @@ class _ProfileTabState extends State<_ProfileTab> {
     _locationCtrl = TextEditingController(text: profile?.location ?? '');
     _githubUrlCtrl = TextEditingController(text: profile?.githubUrl ?? '');
     _linkedinUrlCtrl = TextEditingController(text: profile?.linkedinUrl ?? '');
+    _heroVideoUrlCtrl = TextEditingController(text: profile?.heroVideoUrl ?? '');
     _profileImage = profile?.profileImage ?? '';
   }
 
@@ -341,6 +343,7 @@ class _ProfileTabState extends State<_ProfileTab> {
     _locationCtrl.dispose();
     _githubUrlCtrl.dispose();
     _linkedinUrlCtrl.dispose();
+    _heroVideoUrlCtrl.dispose();
     super.dispose();
   }
 
@@ -364,6 +367,7 @@ class _ProfileTabState extends State<_ProfileTab> {
       location: _locationCtrl.text.trim(),
       githubUrl: _githubUrlCtrl.text.trim(),
       linkedinUrl: _linkedinUrlCtrl.text.trim(),
+      heroVideoUrl: _heroVideoUrlCtrl.text.trim(),
     );
 
 
@@ -523,6 +527,15 @@ class _ProfileTabState extends State<_ProfileTab> {
               controller: _cvUrlCtrl,
               decoration: const InputDecoration(labelText: "CV Download Link / URL", prefixIcon: Icon(Icons.download)),
               validator: (v) => v!.isEmpty ? 'Required' : null,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _heroVideoUrlCtrl,
+              decoration: const InputDecoration(
+                labelText: "Hero Background Video URL (MP4 / WebM Link)",
+                prefixIcon: Icon(Icons.video_library_rounded),
+                helperText: "Paste a direct MP4/WebM video URL to loop in the background of the Hero section across all devices.",
+              ),
             ),
             const SizedBox(height: 32),
             
