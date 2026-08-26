@@ -26,8 +26,41 @@ class PortfolioImage extends StatelessWidget {
       return _buildFallback();
     }
 
-    // 1. Check if the image is a base64 string
-    if (source.startsWith('data:image') || _isBase64(source)) {
+    // 1. Data URI or Web URL
+    if (source.startsWith('data:image') || source.startsWith('http://') || source.startsWith('https://')) {
+      return Image.network(
+        source,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) {
+          if (source.startsWith('data:image')) {
+            try {
+              final cleanBase64 = _getCleanBase64(source);
+              Uint8List bytes;
+              try {
+                bytes = base64Decode(cleanBase64);
+              } catch (_) {
+                bytes = base64Url.decode(cleanBase64);
+              }
+              return Image.memory(
+                bytes,
+                width: width,
+                height: height,
+                fit: fit,
+                errorBuilder: (_, __, ___) => _buildFallback(),
+              );
+            } catch (_) {
+              return _buildFallback();
+            }
+          }
+          return _buildFallback();
+        },
+      );
+    }
+
+    // 2. Raw base64 string
+    if (_isBase64(source)) {
       try {
         final cleanBase64 = _getCleanBase64(source);
         Uint8List bytes;
@@ -44,38 +77,8 @@ class PortfolioImage extends StatelessWidget {
           errorBuilder: (context, error, stackTrace) => _buildFallback(),
         );
       } catch (e) {
-        print('Error decoding base64 image: $e');
         return _buildFallback();
       }
-    }
-
-    // 2. Check if the image is a web URL
-    if (source.startsWith('http://') || source.startsWith('https://')) {
-      return Image.network(
-        source,
-        width: width,
-        height: height,
-        fit: fit,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            width: width,
-            height: height,
-            color: Colors.black.withOpacity(0.04),
-            child: const Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(PortfolioTheme.primary),
-                ),
-              ),
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) => _buildFallback(),
-      );
     }
 
     // 3. Fallback to Asset Image
