@@ -95,13 +95,11 @@ class AdminController extends GetxController {
   Future<String?> uploadVideo(Uint8List videoBytes, {String mimeType = 'video/mp4'}) async {
     isSaving.value = true;
     try {
+      final base64Video = 'data:$mimeType;base64,${base64Encode(videoBytes)}';
       final response = await http.post(
         Uri.parse('$apiHost/upload/video'),
-        headers: {
-          'Content-Type': mimeType,
-          'Authorization': 'Bearer ${token.value}',
-        },
-        body: videoBytes,
+        headers: headers,
+        body: json.encode({'videoData': base64Video}),
       ).timeout(const Duration(seconds: 180));
 
       if (response.statusCode == 200) {
