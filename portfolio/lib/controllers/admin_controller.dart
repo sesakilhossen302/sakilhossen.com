@@ -146,30 +146,31 @@ class AdminController extends GetxController {
     return null;
   }
 
-  Future<bool> updateProfile(Profile profile) async {
+  Future<bool> updateProfileMap(Map<String, dynamic> deltaMap) async {
     isSaving.value = true;
     try {
-      if (Get.isRegistered<PortfolioController>()) {
-        Get.find<PortfolioController>().profile.value = profile;
-      }
       final response = await http.put(
         Uri.parse('$apiHost/portfolio/profile'),
         headers: headers,
-        body: json.encode(profile.toJson()),
+        body: json.encode(deltaMap),
       ).timeout(const Duration(seconds: 180));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData(isSilent: true);
         return true;
       } else {
-        print('Update profile HTTP error ${response.statusCode}: ${response.body}');
+        print('Update profile delta HTTP error ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
-      print('Update profile error: $e');
+      print('Update profile delta error: $e');
     } finally {
       isSaving.value = false;
     }
     return false;
+  }
+
+  Future<bool> updateProfile(Profile profile) async {
+    return updateProfileMap(profile.toJson());
   }
 
   // Project CRUD

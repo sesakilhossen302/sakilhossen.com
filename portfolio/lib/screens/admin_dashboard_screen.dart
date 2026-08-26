@@ -304,6 +304,7 @@ class _ProfileTabState extends State<_ProfileTab> {
   bool _isPasswordVisible = false;
   final List<TextEditingController> _heroVideoCtrls = [];
   String _profileImage = '';
+  Map<String, String> _initialProfileMap = {};
 
   @override
   void initState() {
@@ -329,6 +330,29 @@ class _ProfileTabState extends State<_ProfileTab> {
 
     _initVideoControllers(profile?.heroVideoUrl ?? '');
     _profileImage = profile?.profileImage ?? '';
+    _snapshotInitialData(profile);
+  }
+
+  void _snapshotInitialData(Profile? p) {
+    _initialProfileMap = {
+      'name': p?.name ?? '',
+      'title': p?.title ?? '',
+      'tagline': p?.tagline ?? '',
+      'bio': p?.bio ?? '',
+      'cvUrl': p?.cvUrl ?? '',
+      'experienceYears': p?.experienceYears ?? '',
+      'completedProjects': p?.completedProjects ?? '',
+      'happyClients': p?.happyClients ?? '',
+      'developmentPhilosophy': p?.developmentPhilosophy ?? '',
+      'careerGoals': p?.careerGoals ?? '',
+      'phone': p?.phone ?? '',
+      'email': p?.email ?? '',
+      'location': p?.location ?? '',
+      'githubUrl': p?.githubUrl ?? '',
+      'linkedinUrl': p?.linkedinUrl ?? '',
+      'heroVideoUrl': p?.heroVideoUrl ?? '',
+      'profileImage': p?.profileImage ?? '',
+    };
   }
 
   void _initVideoControllers(String rawUrl) {
@@ -432,36 +456,53 @@ class _ProfileTabState extends State<_ProfileTab> {
   void _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
     
-    final joinedVideoUrls = _heroVideoCtrls
+    final currentJoinedVideoUrls = _heroVideoCtrls
         .map((c) => c.text.trim())
         .where((s) => s.isNotEmpty)
         .join('\n');
 
-    final updatedProfile = Profile(
-      name: _nameCtrl.text.trim(),
-      title: _titleCtrl.text.trim(),
-      tagline: _taglineCtrl.text.trim(),
-      bio: _bioCtrl.text.trim(),
-      cvUrl: _cvUrlCtrl.text.trim(),
-      experienceYears: _expYearsCtrl.text.trim(),
-      completedProjects: _completedProjCtrl.text.trim(),
-      happyClients: _clientsCtrl.text.trim(),
-      developmentPhilosophy: _philosophyCtrl.text.trim(),
-      careerGoals: _goalsCtrl.text.trim(),
-      phone: _phoneCtrl.text.trim(),
-      profileImage: _profileImage,
-      email: _emailCtrl.text.trim(),
-      location: _locationCtrl.text.trim(),
-      githubUrl: _githubUrlCtrl.text.trim(),
-      linkedinUrl: _linkedinUrlCtrl.text.trim(),
-      heroVideoUrl: joinedVideoUrls,
-    );
+    final Map<String, dynamic> currentFormValues = {
+      'name': _nameCtrl.text.trim(),
+      'title': _titleCtrl.text.trim(),
+      'tagline': _taglineCtrl.text.trim(),
+      'bio': _bioCtrl.text.trim(),
+      'cvUrl': _cvUrlCtrl.text.trim(),
+      'experienceYears': _expYearsCtrl.text.trim(),
+      'completedProjects': _completedProjCtrl.text.trim(),
+      'happyClients': _clientsCtrl.text.trim(),
+      'developmentPhilosophy': _philosophyCtrl.text.trim(),
+      'careerGoals': _goalsCtrl.text.trim(),
+      'phone': _phoneCtrl.text.trim(),
+      'email': _emailCtrl.text.trim(),
+      'location': _locationCtrl.text.trim(),
+      'githubUrl': _githubUrlCtrl.text.trim(),
+      'linkedinUrl': _linkedinUrlCtrl.text.trim(),
+      'heroVideoUrl': currentJoinedVideoUrls,
+    };
 
-    final success = await Get.find<AdminController>().updateProfile(updatedProfile);
+    if (_profileImage.isNotEmpty) {
+      currentFormValues['profileImage'] = _profileImage;
+    }
+
+    final Map<String, dynamic> changedFields = {};
+    currentFormValues.forEach((key, value) {
+      if (_initialProfileMap[key] != value) {
+        changedFields[key] = value;
+      }
+    });
+
+    if (changedFields.isEmpty) {
+      Get.snackbar('Info', 'No changes detected to save.', backgroundColor: Colors.blueAccent, colorText: Colors.white);
+      return;
+    }
+
+    final success = await Get.find<AdminController>().updateProfileMap(changedFields);
     if (success) {
-      Get.snackbar('Success', 'Profile details updated successfully', backgroundColor: Colors.green, colorText: Colors.white);
+      final updatedP = Get.find<PortfolioController>().profile.value;
+      _snapshotInitialData(updatedP);
+      Get.snackbar('Success', 'Updated ${changedFields.keys.join(", ")} successfully', backgroundColor: Colors.green, colorText: Colors.white);
     } else {
-      Get.snackbar('Error', 'Failed to save changes', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.snackbar('Error', 'Failed to save changes. Please check server connection.', backgroundColor: Colors.redAccent, colorText: Colors.white);
     }
   }
 
