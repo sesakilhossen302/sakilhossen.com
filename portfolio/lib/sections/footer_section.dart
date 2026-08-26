@@ -25,10 +25,10 @@ class FooterSection extends StatelessWidget {
     final email = profile?.email ?? '';
     final githubUrl = profile?.githubUrl.isNotEmpty == true
         ? profile!.githubUrl
-        : 'https://github.com/sakil';
+        : '';
     final linkedinUrl = profile?.linkedinUrl.isNotEmpty == true
         ? profile!.linkedinUrl
-        : 'https://linkedin.com';
+        : '';
 
     return Container(
       width: double.infinity,
@@ -86,24 +86,21 @@ class FooterSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _FooterSocialButton(
-                assetPath: 'assets/images/github-icons.png',
+                assetPath: 'assets/images/hd_github.png',
                 onPressed: () => _launchUrl(githubUrl),
                 isDark: isDark,
               ),
               const SizedBox(width: 12),
               _FooterSocialButton(
-                assetPath: 'assets/images/Linkedin-icons.png',
+                assetPath: 'assets/images/hd_linkedin.png',
                 onPressed: () => _launchUrl(linkedinUrl),
                 isDark: isDark,
               ),
               const SizedBox(width: 12),
               _FooterSocialButton(
-                assetPath: 'assets/images/email-icons.webp',
-                onPressed: () => _launchUrl(
-                  email.isNotEmpty
-                      ? 'mailto:$email'
-                      : 'mailto:sakil@example.com',
-                ),
+                assetPath: 'assets/images/hd_gmail.png',
+                onPressed: () =>
+                    _launchUrl(email.isNotEmpty ? 'mailto:$email' : ''),
                 isDark: isDark,
               ),
             ],
@@ -157,20 +154,20 @@ class _FooterSocialButtonState extends State<_FooterSocialButton> {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: _isHovered
-                ? PortfolioTheme.primary.withOpacity(0.1)
+                ? PortfolioTheme.primary.withOpacity(0.15)
                 : Colors.transparent,
             shape: BoxShape.circle,
             border: Border.all(
               color: _isHovered
-                  ? PortfolioTheme.primary
-                  : (widget.isDark ? Colors.white10 : Colors.black12),
+                  ? PortfolioTheme.accent
+                  : (widget.isDark ? Colors.white24 : Colors.black26),
               width: 1,
             ),
           ),
           child: Image.asset(
             widget.assetPath,
-            width: 16,
-            height: 16,
+            width: 18,
+            height: 18,
             fit: BoxFit.contain,
           ),
         ),

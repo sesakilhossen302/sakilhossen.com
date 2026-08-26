@@ -288,19 +288,19 @@ class _HeroTextContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _SocialIcon(
-              assetPath: 'assets/images/github-icons.png',
+              assetPath: 'assets/images/hd_github.png',
               url: githubUrl,
               tooltip: 'GitHub',
             ),
             const SizedBox(width: 16),
             _SocialIcon(
-              assetPath: 'assets/images/Linkedin-icons.png',
+              assetPath: 'assets/images/hd_linkedin.png',
               url: linkedinUrl,
               tooltip: 'LinkedIn',
             ),
             const SizedBox(width: 16),
             _SocialIcon(
-              assetPath: 'assets/images/email-icons.webp',
+              assetPath: 'assets/images/hd_gmail.png',
               url: 'mailto:$email',
               tooltip: 'Email',
             ),
@@ -416,9 +416,6 @@ class _SocialIconState extends State<_SocialIcon> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<PortfolioController>();
-    final isDark = controller.isDarkMode.value;
-
     return Tooltip(
       message: widget.tooltip,
       child: MouseRegion(
@@ -431,20 +428,29 @@ class _SocialIconState extends State<_SocialIcon> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: _isHovered
-                  ? PortfolioTheme.primary.withOpacity(0.25)
+                  ? PortfolioTheme.primary.withOpacity(0.3)
                   : const Color(0x1AFFFFFF),
               shape: BoxShape.circle,
               border: Border.all(
                 color: _isHovered
                     ? PortfolioTheme.accent
-                    : Colors.white24,
-                width: 1,
+                    : Colors.white30,
+                width: 1.5,
               ),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: PortfolioTheme.accent.withOpacity(0.4),
+                        blurRadius: 14,
+                        spreadRadius: 2,
+                      ),
+                    ]
+                  : [],
             ),
             child: Image.asset(
               widget.assetPath,
-              width: 20,
-              height: 20,
+              width: 24,
+              height: 24,
               fit: BoxFit.contain,
             ),
           ),
