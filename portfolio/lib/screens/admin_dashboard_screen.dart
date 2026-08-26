@@ -365,6 +365,8 @@ class _ProfileTabState extends State<_ProfileTab> {
         .split(RegExp(r'[\n,;]+'))
         .map((s) => s.trim())
         .where((s) => s.isNotEmpty)
+        .where((s) => s.startsWith('http://') || s.startsWith('https://') || s.startsWith('/uploads/'))
+        .where((s) => !s.contains(';base64,') && s.length < 2000)
         .toList();
 
     if (links.isEmpty) {
