@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../models/portfolio_models.dart';
 import '../models/project_model.dart';
+import '../utils/storage_helper.dart';
 import 'portfolio_controller.dart';
 
 class AdminController extends GetxController {
@@ -15,6 +17,22 @@ class AdminController extends GetxController {
   final RxBool isLoadingInbox = false.obs;
   
   final RxList<ContactMessage> inboxMessages = <ContactMessage>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _restoreSavedToken();
+  }
+
+  void _restoreSavedToken() {
+    final savedToken = StorageHelper.getToken();
+    if (savedToken != null && savedToken.isNotEmpty) {
+      token.value = savedToken;
+      isLoggedIn.value = true;
+      fetchInbox();
+      print('Restored persistent admin token from LocalStorage');
+    }
+  }
 
   Map<String, String> get headers => {
     'Content-Type': 'application/json',
@@ -35,7 +53,7 @@ class AdminController extends GetxController {
         token.value = data['token'] ?? '';
         isLoggedIn.value = true;
         
-        // Load messages and current values
+        StorageHelper.saveToken(token.value);
         fetchInbox();
         return true;
       }
@@ -45,6 +63,13 @@ class AdminController extends GetxController {
       isSaving.value = false;
     }
     return false;
+  }
+
+  void logout() {
+    token.value = '';
+    isLoggedIn.value = false;
+    inboxMessages.clear();
+    StorageHelper.clearToken();
   }
 
   Future<bool> changePassword(String newPassword) async {
@@ -68,11 +93,7 @@ class AdminController extends GetxController {
     return false;
   }
 
-  void logout() {
-    token.value = '';
-    isLoggedIn.value = false;
-    inboxMessages.clear();
-  }
+
 
   Future<void> fetchInbox() async {
     if (!isLoggedIn.value) return;
@@ -147,6 +168,18 @@ class AdminController extends GetxController {
   }
 
   Future<bool> updateProfileMap(Map<String, dynamic> deltaMap) async {
+    if (!isLoggedIn.value || token.value.isEmpty) {
+      Get.snackbar(
+        'Session Expired',
+        'Please log in again to save changes.',
+        backgroundColor: Colors.deepOrange,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 4),
+      );
+      Get.offAllNamed('/admin');
+      return false;
+    }
+
     isSaving.value = true;
     try {
       final response = await http.put(
@@ -158,6 +191,18 @@ class AdminController extends GetxController {
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData(isSilent: true);
         return true;
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        print('Session expired on save (${response.statusCode}). Redirecting to login.');
+        logout();
+        Get.snackbar(
+          'Session Expired',
+          'Your login token expired. Please log in again.',
+          backgroundColor: Colors.deepOrange,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 4),
+        );
+        Get.offAllNamed('/admin');
+        return false;
       } else {
         print('Update profile delta HTTP error ${response.statusCode}: ${response.body}');
       }
