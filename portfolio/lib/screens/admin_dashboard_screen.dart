@@ -573,19 +573,41 @@ class _ProfileTabState extends State<_ProfileTab> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     ),
                     onPressed: () async {
-                      final videoData = await pickVideoAsBase64();
-                      if (videoData != null) {
-                        final sizeMb = (videoData.length / (1024 * 1024)).toStringAsFixed(1);
-                        setState(() {
-                          _uploadedVideoBase64 = videoData;
-                          _heroVideoUrlCtrl.text = '[Uploaded Video File: $sizeMb MB]';
-                        });
+                      final picked = await pickVideoFile();
+                      if (picked != null) {
+                        final sizeMb = (picked.size / (1024 * 1024)).toStringAsFixed(1);
                         Get.snackbar(
-                          'Video Selected ($sizeMb MB)',
-                          'Video file loaded. Click Save Details to update live background.',
-                          backgroundColor: Colors.green,
+                          'Uploading Video ($sizeMb MB)...',
+                          'Please wait while video is uploading to server...',
+                          backgroundColor: Colors.blueAccent,
                           colorText: Colors.white,
+                          duration: const Duration(seconds: 10),
                         );
+
+                        final videoUrl = await Get.find<AdminController>().uploadVideo(
+                          picked.bytes,
+                          mimeType: picked.mimeType,
+                        );
+
+                        if (videoUrl != null) {
+                          setState(() {
+                            _uploadedVideoBase64 = '';
+                            _heroVideoUrlCtrl.text = videoUrl;
+                          });
+                          Get.snackbar(
+                            'Upload Complete!',
+                            'Video uploaded successfully. Click Save Details to apply.',
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white,
+                          );
+                        } else {
+                          Get.snackbar(
+                            'Upload Failed',
+                            'Failed to upload video to server. Please try again.',
+                            backgroundColor: Colors.redAccent,
+                            colorText: Colors.white,
+                          );
+                        }
                       }
                     },
                   ),

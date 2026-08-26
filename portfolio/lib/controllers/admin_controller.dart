@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../models/portfolio_models.dart';
@@ -90,6 +91,32 @@ class AdminController extends GetxController {
   }
 
   // --- CRUD API METHODS ---
+
+  Future<String?> uploadVideo(Uint8List videoBytes, {String mimeType = 'video/mp4'}) async {
+    isSaving.value = true;
+    try {
+      final response = await http.post(
+        Uri.parse('$apiHost/upload/video'),
+        headers: {
+          'Content-Type': mimeType,
+          'Authorization': 'Bearer ${token.value}',
+        },
+        body: videoBytes,
+      ).timeout(const Duration(seconds: 180));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['url'] as String?;
+      } else {
+        print('Upload video HTTP error ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      print('Upload video error: $e');
+    } finally {
+      isSaving.value = false;
+    }
+    return null;
+  }
 
   Future<bool> updateProfile(Profile profile) async {
     isSaving.value = true;
