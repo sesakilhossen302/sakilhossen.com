@@ -300,6 +300,8 @@ class _ProfileTabState extends State<_ProfileTab> {
   late TextEditingController _locationCtrl;
   late TextEditingController _githubUrlCtrl;
   late TextEditingController _linkedinUrlCtrl;
+  late TextEditingController _newPasswordCtrl;
+  bool _isPasswordVisible = false;
   final List<TextEditingController> _heroVideoCtrls = [];
   String _profileImage = '';
 
@@ -323,6 +325,7 @@ class _ProfileTabState extends State<_ProfileTab> {
     _locationCtrl = TextEditingController(text: profile?.location ?? '');
     _githubUrlCtrl = TextEditingController(text: profile?.githubUrl ?? '');
     _linkedinUrlCtrl = TextEditingController(text: profile?.linkedinUrl ?? '');
+    _newPasswordCtrl = TextEditingController();
 
     _initVideoControllers(profile?.heroVideoUrl ?? '');
     _profileImage = profile?.profileImage ?? '';
@@ -366,6 +369,7 @@ class _ProfileTabState extends State<_ProfileTab> {
     _locationCtrl.dispose();
     _githubUrlCtrl.dispose();
     _linkedinUrlCtrl.dispose();
+    _newPasswordCtrl.dispose();
     for (var c in _heroVideoCtrls) {
       c.dispose();
     }
@@ -741,6 +745,81 @@ class _ProfileTabState extends State<_ProfileTab> {
               maxLines: 2,
               decoration: const InputDecoration(labelText: "Career Goals", prefixIcon: Icon(Icons.flag)),
               validator: (v) => v!.isEmpty ? 'Required' : null,
+            ),
+            const SizedBox(height: 36),
+            const Divider(color: Colors.white12),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                const Icon(Icons.shield_rounded, color: PortfolioTheme.accent, size: 24),
+                const SizedBox(width: 10),
+                Text(
+                  "Admin Security & Password Settings",
+                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Initial default password is set to Sakil@302. Enter a new password below to update your login credentials in MongoDB.",
+              style: GoogleFonts.inter(color: Colors.grey[400], fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.03),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.08)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _newPasswordCtrl,
+                      obscureText: !_isPasswordVisible,
+                      decoration: InputDecoration(
+                        labelText: "New Admin Password",
+                        hintText: "Enter new password (e.g. Sakil@302)",
+                        prefixIcon: const Icon(Icons.lock_rounded),
+                        suffixIcon: IconButton(
+                          icon: Icon(_isPasswordVisible ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.security_rounded, size: 18),
+                    label: const Text("Update Password"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () async {
+                      final newPass = _newPasswordCtrl.text.trim();
+                      if (newPass.isEmpty) {
+                        Get.snackbar('Error', 'Please enter a password', backgroundColor: Colors.redAccent, colorText: Colors.white);
+                        return;
+                      }
+                      final success = await Get.find<AdminController>().changePassword(newPass);
+                      if (success) {
+                        _newPasswordCtrl.clear();
+                        Get.snackbar('Success', 'Admin password updated successfully in MongoDB!', backgroundColor: Colors.green, colorText: Colors.white);
+                      } else {
+                        Get.snackbar('Error', 'Failed to update password', backgroundColor: Colors.redAccent, colorText: Colors.white);
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 40),
 

@@ -47,6 +47,27 @@ class AdminController extends GetxController {
     return false;
   }
 
+  Future<bool> changePassword(String newPassword) async {
+    if (!isLoggedIn.value) return false;
+    isSaving.value = true;
+    try {
+      final response = await http.put(
+        Uri.parse('$apiHost/auth/change-password'),
+        headers: headers,
+        body: json.encode({'newPassword': newPassword}),
+      ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (e) {
+      print('Change password error: $e');
+    } finally {
+      isSaving.value = false;
+    }
+    return false;
+  }
+
   void logout() {
     token.value = '';
     isLoggedIn.value = false;
