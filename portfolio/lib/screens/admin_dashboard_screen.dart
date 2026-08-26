@@ -301,6 +301,7 @@ class _ProfileTabState extends State<_ProfileTab> {
   late TextEditingController _linkedinUrlCtrl;
   late TextEditingController _heroVideoUrlCtrl;
   String _profileImage = '';
+  String _uploadedVideoBase64 = '';
 
   @override
   void initState() {
@@ -322,7 +323,16 @@ class _ProfileTabState extends State<_ProfileTab> {
     _locationCtrl = TextEditingController(text: profile?.location ?? '');
     _githubUrlCtrl = TextEditingController(text: profile?.githubUrl ?? '');
     _linkedinUrlCtrl = TextEditingController(text: profile?.linkedinUrl ?? '');
-    _heroVideoUrlCtrl = TextEditingController(text: profile?.heroVideoUrl ?? '');
+
+    final initialVideo = profile?.heroVideoUrl ?? '';
+    if (initialVideo.startsWith('data:video') || initialVideo.length > 500) {
+      _uploadedVideoBase64 = initialVideo;
+      final sizeMb = (initialVideo.length / (1024 * 1024)).toStringAsFixed(1);
+      _heroVideoUrlCtrl = TextEditingController(text: '[Uploaded Video File: $sizeMb MB]');
+    } else {
+      _uploadedVideoBase64 = '';
+      _heroVideoUrlCtrl = TextEditingController(text: initialVideo);
+    }
     _profileImage = profile?.profileImage ?? '';
   }
 
@@ -350,6 +360,15 @@ class _ProfileTabState extends State<_ProfileTab> {
   void _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
     
+    String finalVideoUrl = '';
+    if (_uploadedVideoBase64.isNotEmpty) {
+      finalVideoUrl = _uploadedVideoBase64;
+    } else if (_heroVideoUrlCtrl.text.startsWith('[Uploaded Video File')) {
+      finalVideoUrl = Get.find<PortfolioController>().profile.value?.heroVideoUrl ?? '';
+    } else {
+      finalVideoUrl = _heroVideoUrlCtrl.text.trim();
+    }
+
     final updatedProfile = Profile(
       name: _nameCtrl.text.trim(),
       title: _titleCtrl.text.trim(),
@@ -367,9 +386,8 @@ class _ProfileTabState extends State<_ProfileTab> {
       location: _locationCtrl.text.trim(),
       githubUrl: _githubUrlCtrl.text.trim(),
       linkedinUrl: _linkedinUrlCtrl.text.trim(),
-      heroVideoUrl: _heroVideoUrlCtrl.text.trim(),
+      heroVideoUrl: finalVideoUrl,
     );
-
 
     final success = await Get.find<AdminController>().updateProfile(updatedProfile);
     if (success) {
@@ -535,10 +553,13 @@ class _ProfileTabState extends State<_ProfileTab> {
                 Expanded(
                   child: TextFormField(
                     controller: _heroVideoUrlCtrl,
-                    decoration: const InputDecoration(
+                    readOnly: _heroVideoUrlCtrl.text.startsWith('[Uploaded Video File'),
+                    decoration: InputDecoration(
                       labelText: "Hero Background Video (Upload or Paste Link)",
-                      prefixIcon: Icon(Icons.video_library_rounded),
-                      helperText: "Upload a video file directly from your PC/Mobile or paste a video URL.",
+                      prefixIcon: const Icon(Icons.video_library_rounded),
+                      helperText: _heroVideoUrlCtrl.text.startsWith('[Uploaded Video File')
+                          ? "Video file is loaded. Click Save Details to update background or Delete to change."
+                          : "Upload a video file directly from your PC/Mobile or paste a video URL.",
                     ),
                   ),
                 ),
@@ -554,12 +575,14 @@ class _ProfileTabState extends State<_ProfileTab> {
                     onPressed: () async {
                       final videoData = await pickVideoAsBase64();
                       if (videoData != null) {
+                        final sizeMb = (videoData.length / (1024 * 1024)).toStringAsFixed(1);
                         setState(() {
-                          _heroVideoUrlCtrl.text = videoData;
+                          _uploadedVideoBase64 = videoData;
+                          _heroVideoUrlCtrl.text = '[Uploaded Video File: $sizeMb MB]';
                         });
                         Get.snackbar(
-                          'Video Loaded',
-                          'Video file selected. Click Save Details to update live background.',
+                          'Video Selected ($sizeMb MB)',
+                          'Video file loaded. Click Save Details to update live background.',
                           backgroundColor: Colors.green,
                           colorText: Colors.white,
                         );
@@ -567,7 +590,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                     },
                   ),
                 ),
-                if (_heroVideoUrlCtrl.text.isNotEmpty) ...[
+                if (_heroVideoUrlCtrl.text.isNotEmpty || _uploadedVideoBase64.isNotEmpty) ...[
                   const SizedBox(width: 8),
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -576,6 +599,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                       tooltip: "Remove Video",
                       onPressed: () {
                         setState(() {
+                          _uploadedVideoBase64 = '';
                           _heroVideoUrlCtrl.clear();
                         });
                       },
