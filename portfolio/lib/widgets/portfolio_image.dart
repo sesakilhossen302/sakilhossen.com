@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../theme/portfolio_theme.dart';
 
@@ -29,7 +30,12 @@ class PortfolioImage extends StatelessWidget {
     if (source.startsWith('data:image') || _isBase64(source)) {
       try {
         final cleanBase64 = _getCleanBase64(source);
-        final bytes = base64Decode(cleanBase64);
+        Uint8List bytes;
+        try {
+          bytes = base64Decode(cleanBase64);
+        } catch (_) {
+          bytes = base64Url.decode(cleanBase64);
+        }
         return Image.memory(
           bytes,
           width: width,
@@ -105,12 +111,11 @@ class PortfolioImage extends StatelessWidget {
     if (clean.contains(',')) {
       clean = clean.split(',')[1];
     }
-    clean = clean.replaceAll('-', '+').replaceAll('_', '/');
     final remainder = clean.length % 4;
     if (remainder != 0) {
       clean = clean + '=' * (4 - remainder);
     }
-    final regex = RegExp(r'^[a-zA-Z0-9+/]*={0,2}$');
+    final regex = RegExp(r'^[a-zA-Z0-9+/=_-]+$');
     return regex.hasMatch(clean);
   }
 
@@ -120,7 +125,6 @@ class PortfolioImage extends StatelessWidget {
       clean = clean.split(',')[1];
     }
     clean = clean.replaceAll(RegExp(r'\s+'), '');
-    clean = clean.replaceAll('-', '+').replaceAll('_', '/');
     final remainder = clean.length % 4;
     if (remainder != 0) {
       clean = clean + '=' * (4 - remainder);
