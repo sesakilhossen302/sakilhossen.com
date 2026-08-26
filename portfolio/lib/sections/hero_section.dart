@@ -468,7 +468,6 @@ class _HeroGraphicState extends State<HeroGraphic>
     _SkillOrbitBadge(label: 'Dart', assetPath: 'assets/images/tech/dart.png', color: Color(0xFF29B6F6)),
     _SkillOrbitBadge(label: 'iOS', assetPath: 'assets/images/tech/apple.png', color: Colors.white),
     _SkillOrbitBadge(label: 'GitHub', assetPath: 'assets/images/tech/github.png', color: Color(0xFFFF7043)),
-    _SkillOrbitBadge(label: 'GetX', assetPath: 'assets/images/tech/getx.png', color: Color(0xFF10B981)),
   ];
 
   @override
