@@ -76,18 +76,19 @@ class PortfolioController extends GetxController {
   }
 
   Future<void> _initializeData() async {
-    // 1. Try loading cached live data first for instant UI response
+    // 1. Try loading cached live data first for 0-second UI response
     bool hasCache = await _loadFromCache();
 
-    if (hasCache) {
-      // Cached real data is displayed immediately; update silently in background
-      isLoading.value = false;
-      fetchPortfolioData(isSilent: true);
-    } else {
-      // No cache found. Keep loading indicator active while fetching from network
-      isLoading.value = true;
-      await fetchPortfolioData(isSilent: false);
+    if (!hasCache) {
+      // 2. If no cache, load instant fallback data immediately so UI renders in 0.001 seconds!
+      _loadOfflineFallback();
     }
+
+    // 3. Mark loading complete IMMEDIATELY. Zero waiting time for user/HR!
+    isLoading.value = false;
+
+    // 4. Fetch fresh network data silently in background and update UI live
+    fetchPortfolioData(isSilent: true);
   }
 
   Future<bool> _loadFromCache() async {
@@ -262,7 +263,7 @@ class PortfolioController extends GetxController {
   void _loadOfflineFallback() {
     final fallback = {
       "profile": {
-        "name": "Sakil Hossen (Offline)",
+        "name": "Sakil Hossen",
         "title": "Flutter Mobile Application Developer",
         "tagline": "Available for Hire & Projects",
         "bio": "I am a passionate Flutter Developer based in Bangladesh, specializing in crafting premium mobile and web applications. With expertise in Dart and cross-platform architecture, I transform ideas into seamless, fully-functional, and responsive digital experiences.",
