@@ -392,6 +392,13 @@ class _ProfileTabState extends State<_ProfileTab> {
 
     final success = await Get.find<AdminController>().updateProfile(updatedProfile);
     if (success) {
+      final savedUrl = Get.find<PortfolioController>().profile.value?.heroVideoUrl ?? '';
+      setState(() {
+        _uploadedVideoBase64 = '';
+        if (savedUrl.isNotEmpty) {
+          _heroVideoUrlCtrl.text = savedUrl;
+        }
+      });
       Get.snackbar('Success', 'Profile details updated successfully', backgroundColor: Colors.green, colorText: Colors.white);
     } else {
       Get.snackbar('Error', 'Failed to save changes', backgroundColor: Colors.redAccent, colorText: Colors.white);
