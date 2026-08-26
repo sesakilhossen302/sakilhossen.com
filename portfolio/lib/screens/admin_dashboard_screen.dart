@@ -300,9 +300,8 @@ class _ProfileTabState extends State<_ProfileTab> {
   late TextEditingController _locationCtrl;
   late TextEditingController _githubUrlCtrl;
   late TextEditingController _linkedinUrlCtrl;
-  late TextEditingController _heroVideoUrlCtrl;
+  final List<TextEditingController> _heroVideoCtrls = [];
   String _profileImage = '';
-  String _uploadedVideoBase64 = '';
 
   @override
   void initState() {
@@ -325,16 +324,29 @@ class _ProfileTabState extends State<_ProfileTab> {
     _githubUrlCtrl = TextEditingController(text: profile?.githubUrl ?? '');
     _linkedinUrlCtrl = TextEditingController(text: profile?.linkedinUrl ?? '');
 
-    final initialVideo = profile?.heroVideoUrl ?? '';
-    if (initialVideo.startsWith('data:video') || initialVideo.length > 500) {
-      _uploadedVideoBase64 = initialVideo;
-      final sizeMb = (initialVideo.length / (1024 * 1024)).toStringAsFixed(1);
-      _heroVideoUrlCtrl = TextEditingController(text: '[Uploaded Video File: $sizeMb MB]');
-    } else {
-      _uploadedVideoBase64 = '';
-      _heroVideoUrlCtrl = TextEditingController(text: initialVideo);
-    }
+    _initVideoControllers(profile?.heroVideoUrl ?? '');
     _profileImage = profile?.profileImage ?? '';
+  }
+
+  void _initVideoControllers(String rawUrl) {
+    for (var c in _heroVideoCtrls) {
+      c.dispose();
+    }
+    _heroVideoCtrls.clear();
+
+    final links = rawUrl
+        .split(RegExp(r'[\n,;]+'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    if (links.isEmpty) {
+      _heroVideoCtrls.add(TextEditingController(text: ''));
+    } else {
+      for (var link in links) {
+        _heroVideoCtrls.add(TextEditingController(text: link));
+      }
+    }
   }
 
   @override
@@ -354,13 +366,73 @@ class _ProfileTabState extends State<_ProfileTab> {
     _locationCtrl.dispose();
     _githubUrlCtrl.dispose();
     _linkedinUrlCtrl.dispose();
-    _heroVideoUrlCtrl.dispose();
+    for (var c in _heroVideoCtrls) {
+      c.dispose();
+    }
+    _heroVideoCtrls.clear();
     super.dispose();
+  }
+
+  void _addNewVideoField() {
+    setState(() {
+      _heroVideoCtrls.add(TextEditingController(text: ''));
+    });
+  }
+
+  void _confirmDeleteVideoField(int index) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 26),
+            const SizedBox(width: 10),
+            Text("Delete Video Link?", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+          ],
+        ),
+        content: Text(
+          "Are you sure you want to remove Video #${index + 1} from your background playlist?",
+          style: GoogleFonts.inter(color: const Color(0xFFCBD5E1), fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text("Cancel", style: GoogleFonts.outfit(color: Colors.grey[400])),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.delete_forever_rounded, size: 18),
+            label: const Text("Delete"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              Get.back();
+              setState(() {
+                _heroVideoCtrls[index].dispose();
+                _heroVideoCtrls.removeAt(index);
+                if (_heroVideoCtrls.isEmpty) {
+                  _heroVideoCtrls.add(TextEditingController(text: ''));
+                }
+              });
+              _saveProfile();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
     
+    final joinedVideoUrls = _heroVideoCtrls
+        .map((c) => c.text.trim())
+        .where((s) => s.isNotEmpty)
+        .join('\n');
+
     final updatedProfile = Profile(
       name: _nameCtrl.text.trim(),
       title: _titleCtrl.text.trim(),
@@ -378,18 +450,11 @@ class _ProfileTabState extends State<_ProfileTab> {
       location: _locationCtrl.text.trim(),
       githubUrl: _githubUrlCtrl.text.trim(),
       linkedinUrl: _linkedinUrlCtrl.text.trim(),
-      heroVideoUrl: _heroVideoUrlCtrl.text.trim(),
+      heroVideoUrl: joinedVideoUrls,
     );
 
     final success = await Get.find<AdminController>().updateProfile(updatedProfile);
     if (success) {
-      final savedUrl = Get.find<PortfolioController>().profile.value?.heroVideoUrl ?? '';
-      setState(() {
-        _uploadedVideoBase64 = '';
-        if (savedUrl.isNotEmpty) {
-          _heroVideoUrlCtrl.text = savedUrl;
-        }
-      });
       Get.snackbar('Success', 'Profile details updated successfully', backgroundColor: Colors.green, colorText: Colors.white);
     } else {
       Get.snackbar('Error', 'Failed to save changes', backgroundColor: Colors.redAccent, colorText: Colors.white);
@@ -546,15 +611,82 @@ class _ProfileTabState extends State<_ProfileTab> {
               validator: (v) => v!.isEmpty ? 'Required' : null,
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _heroVideoUrlCtrl,
-              maxLines: 3,
-              minLines: 1,
-              decoration: const InputDecoration(
-                labelText: "Hero Background Video Playlist URLs (Google Drive / Direct Links)",
-                prefixIcon: Icon(Icons.video_library_rounded),
-                helperText: "Add multiple video links (one URL per line or separated by commas). They will play sequentially one after another in a loop!",
-              ),
+            // --- HERO BACKGROUND VIDEO PLAYLIST MANAGER ---
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.video_library_rounded, color: PortfolioTheme.accent, size: 22),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Hero Background Videos Playlist",
+                      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ],
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
+                  label: const Text("+ Add New Video URL"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: PortfolioTheme.accent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: _addNewVideoField,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _heroVideoCtrls.length,
+              separatorBuilder: (ctx, i) => const SizedBox(height: 12),
+              itemBuilder: (ctx, index) {
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: PortfolioTheme.accent.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          "Video #${index + 1}",
+                          style: GoogleFonts.outfit(color: PortfolioTheme.accent, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _heroVideoCtrls[index],
+                          decoration: const InputDecoration(
+                            hintText: "Paste Google Drive share link or direct MP4 URL",
+                            prefixIcon: Icon(Icons.link_rounded),
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.delete_forever_rounded, color: Colors.redAccent),
+                        tooltip: "Delete Video #${index + 1}",
+                        onPressed: () => _confirmDeleteVideoField(index),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 32),
             
