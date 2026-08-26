@@ -101,11 +101,13 @@ class AdminController extends GetxController {
         Uri.parse('$apiHost/portfolio/profile'),
         headers: headers,
         body: json.encode(profile.toJson()),
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 180));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData(isSilent: true);
         return true;
+      } else {
+        print('Update profile HTTP error ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print('Update profile error: $e');
