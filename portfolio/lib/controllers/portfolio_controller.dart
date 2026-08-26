@@ -76,19 +76,18 @@ class PortfolioController extends GetxController {
   }
 
   Future<void> _initializeData() async {
-    // 1. Try loading cached live data first for 0-second UI response
+    // 1. Try loading cached live data first for instant UI response
     bool hasCache = await _loadFromCache();
 
-    if (!hasCache) {
-      // 2. If no cache, load instant fallback data immediately so UI renders in 0.001 seconds!
-      _loadOfflineFallback();
+    if (hasCache) {
+      // Cached real data is displayed immediately; update silently in background
+      isLoading.value = false;
+      fetchPortfolioData(isSilent: true);
+    } else {
+      // No cache found. Keep loading indicator active while fetching 100% dynamic data from API
+      isLoading.value = true;
+      await fetchPortfolioData(isSilent: false);
     }
-
-    // 3. Mark loading complete IMMEDIATELY. Zero waiting time for user/HR!
-    isLoading.value = false;
-
-    // 4. Fetch fresh network data silently in background and update UI live
-    fetchPortfolioData(isSilent: true);
   }
 
   Future<bool> _loadFromCache() async {
@@ -186,8 +185,7 @@ class PortfolioController extends GetxController {
     }
 
     if (!success && profile.value == null && !isSilent) {
-      // Only fall back to offline data if network requests failed AND no cached data is present
-      _loadOfflineFallback();
+      print('Failed to fetch live portfolio data from backend API');
     }
 
     if (!isSilent) {
@@ -257,206 +255,5 @@ class PortfolioController extends GetxController {
       print('Failed to send contact message: $e');
     }
     return false;
-  }
-
-  // Offline Fallback Data
-  void _loadOfflineFallback() {
-    final fallback = {
-      "profile": {
-        "name": "Sakil Hossen",
-        "title": "Flutter Mobile Application Developer",
-        "tagline": "Available for Hire & Projects",
-        "bio": "I am a passionate Flutter Developer based in Bangladesh, specializing in crafting premium mobile and web applications. With expertise in Dart and cross-platform architecture, I transform ideas into seamless, fully-functional, and responsive digital experiences.",
-        "cvUrl": "https://github.com/sakil",
-        "experienceYears": "3+",
-        "completedProjects": "20+",
-        "happyClients": "10+",
-        "developmentPhilosophy": "I place a strong emphasis on clean code architecture (like Clean Architecture or MVC/MVVM), pixel-perfect UI designs, interactive animations, and stellar app performance. Whether it is a web platform, a mobile utility, or an API integration, I strive for excellence in every project.",
-        "careerGoals": "To build scalable, robust mobile apps that run globally and collaborate in high-performing international teams.",
-        "phone": "+880 1700-000000",
-        "profileImage": "",
-        "email": "sakil@example.com",
-        "location": "Dhaka, Bangladesh"
-      },
-
-      "projects": [
-        {
-          "id": "proj-1",
-          "title": "Quran International",
-          "description": "A multilingual Quran application designed to bring the holy book to a global audience. It features dynamic script scaling, offline audio recitations, bookmarks, translations, and robust searching, built with clean architecture.",
-          "image": "assets/images/quran_international.png",
-          "playStoreUrl": "https://play.google.com/store/apps",
-          "appStoreUrl": "https://apps.apple.com/app",
-          "githubUrl": "https://github.com/sakil/quran-international",
-          "tags": ["Flutter", "Dart", "Clean Architecture", "SQLite", "Audio Player"],
-          "features": [
-            "Multilingual Translation Support (English, Bengali, Urdu, Spanish, etc.)",
-            "Offline Audio Recitation with verse-by-verse highlight syncing",
-            "Advanced bookmarking, indexing, and notes system",
-            "ATS-friendly clean, modern, readable typography settings"
-          ]
-        },
-        {
-          "id": "proj-2",
-          "title": "Live Stream App",
-          "description": "A high-performance live video streaming application with real-time comments, live reactions, audience interactions, and payment support. Built to handle low latency stream connections.",
-          "image": "assets/images/live_stream.png",
-          "playStoreUrl": "https://play.google.com/store/apps",
-          "appStoreUrl": "",
-          "githubUrl": "https://github.com/sakil/live-stream-app",
-          "tags": ["Flutter", "WebRTC", "Agora SDK", "WebSocket", "Node.js"],
-          "features": [
-            "Ultra-low latency live video streaming with Agora SDK integration",
-            "Real-time chat feed with floating hearts and custom emoji animations",
-            "Virtual gifting and in-app purchase token system",
-            "Co-hosting and split-screen video capability"
-          ]
-        },
-        {
-          "id": "proj-3",
-          "title": "Restaurant Booking System",
-          "description": "A premium table booking and reservation management system for restaurants. Features visual table mapping, menu pre-ordering, custom notifications, and interactive scheduling.",
-          "image": "assets/images/restaurant_booking.png",
-          "playStoreUrl": "",
-          "appStoreUrl": "https://apps.apple.com/app",
-          "githubUrl": "https://github.com/sakil/restaurant-booking",
-          "tags": ["Flutter Web", "REST API", "State Management", "Google Maps"],
-          "features": [
-            "Interactive floor plan for selecting specific tables visually",
-            "Seamless reservation scheduling with calendar and push notification reminders",
-            "Pre-order meals directly from the digital menu during booking",
-            "Admin control panel for managers to manage bookings and menus"
-          ]
-        },
-        {
-          "id": "proj-4",
-          "title": "Job Booking System",
-          "description": "A comprehensive marketplace app connecting service providers with clients. Features scheduling, Stripe payments, real-time tracking of providers, and in-app push alerts.",
-          "image": "assets/images/job_booking.png",
-          "playStoreUrl": "https://play.google.com/store/apps",
-          "appStoreUrl": "https://apps.apple.com/app",
-          "githubUrl": "",
-          "tags": ["Flutter", "Firebase", "Stripe Payment", "Push Notifications", "Dio"],
-          "features": [
-            "On-demand job scheduling with auto-matching algorithms",
-            "Integrated secure payments via Stripe and Apple/Google Pay",
-            "Real-time technician location tracking on interactive maps",
-            "Built-in rating and reviews system for quality assurance"
-          ]
-        }
-      ],
-      "skills": [
-        {
-          "category": "Mobile Development",
-          "items": ["Flutter", "Dart", "Android", "iOS"]
-        },
-        {
-          "category": "State Management",
-          "items": ["GetX", "Provider"]
-        },
-        {
-          "category": "Backend Integration",
-          "items": ["REST API", "Firebase", "Dio", "HTTP"]
-        },
-        {
-          "category": "Payments",
-          "items": ["Stripe", "Google Pay", "Apple Pay", "In-App Purchase"]
-        },
-        {
-          "category": "Real-Time Systems",
-          "items": ["WebSocket", "Live Chat", "Push Notifications"]
-        },
-        {
-          "category": "Developer Tools",
-          "items": ["Git", "GitHub", "Postman", "Android Studio", "VS Code"]
-        },
-        {
-          "category": "AI Productivity",
-          "items": ["Prompt Engineering", "ChatGPT", "Gemini", "Claude", "AI Workflow Optimization"]
-        }
-      ],
-      "experience": [
-        {
-          "id": "exp-1",
-          "role": "Flutter Mobile Application Developer",
-          "company": "SparkTech Agency",
-          "duration": "2023 - Present",
-          "achievements": [
-            "Delivered 9+ premium production-ready mobile applications to global clients",
-            "Integrated complex payment gateways (Stripe, Google Pay, Apple Pay) in Flutter apps",
-            "Developed low-latency real-time systems using WebSockets, Agora, and Push Notifications",
-            "Collaborated with international developers and designers in remote agile environments",
-            "Managed successful production deployments to Google Play Store and Apple App Store"
-          ]
-        }
-      ],
-      "education": [
-        {
-          "id": "edu-1",
-          "institution": "TMSS Polytechnic Institute",
-          "degree": "Diploma in Computer Science & Technology",
-          "duration": "2019 - 2023",
-          "details": "Focused on computer systems, database design, data structures, and core software engineering concepts."
-        },
-        {
-          "id": "edu-2",
-          "institution": "BD Calling Academy",
-          "degree": "Flutter App Development Training",
-          "duration": "2023 (6 Months)",
-          "details": "Intensive hands-on training in cross-platform mobile architecture, state management, and real-world project deployments."
-        }
-      ],
-      "references": [
-        {
-          "id": "ref-1",
-          "clientName": "Sarah Jenkins",
-          "clientCompany": "Product Director, TechNova",
-          "clientComment": "Sakil is an exceptional Flutter developer. He delivered our cross-platform MVP two weeks ahead of schedule. The animations are incredibly smooth and the code is very easy to read. Highly recommended!",
-          "clientRating": 5.0,
-          "clientImage": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150"
-        },
-        {
-          "id": "ref-2",
-          "clientName": "Alex Rivera",
-          "clientCompany": "Founder, Vibez Streaming",
-          "clientComment": "Working with Sakil Hossen was a great experience. He helped us resolve major audio sync and performance issues in our app. His understanding of WebRTC and WebSockets is outstanding.",
-          "clientRating": 4.9,
-          "clientImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
-        }
-      ],
-      "aiWorkflow": [
-        {
-          "title": "AI-Assisted Development",
-          "description": "Utilizing advanced code generation tools to write boilerplate, speed up syntax declarations, and improve software delivery timeframes.",
-          "icon": "code"
-        },
-        {
-          "title": "Prompt Engineering",
-          "description": "Formulating detailed, contextual prompts to extract high-quality code structures, solutions to algorithms, and mock dataset configurations.",
-          "icon": "psychology"
-        },
-        {
-          "title": "Rapid Prototyping",
-          "description": "Spawning mock application mockups, state models, and JSON API payloads swiftly to demonstrate project feasibility in record time.",
-          "icon": "bolt"
-        },
-        {
-          "title": "Requirement Analysis",
-          "description": "Summarizing lengthy software specifications and user stories to map architectural diagrams and draft precise database models.",
-          "icon": "analytics"
-        },
-        {
-          "title": "Development Productivity",
-          "description": "Streamlining IDE setup workflows, script automation, and linter debugging to maintain optimal concentration on business logic coding.",
-          "icon": "auto_awesome"
-        },
-        {
-          "title": "AI-Powered Debugging",
-          "description": "Analyzing stack traces and memory leaks with intelligent search queries to troubleshoot issues across multi-threaded operations quickly.",
-          "icon": "bug_report"
-        }
-      ]
-    };
-    _parseData(fallback);
   }
 }
