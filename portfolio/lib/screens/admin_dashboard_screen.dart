@@ -361,15 +361,6 @@ class _ProfileTabState extends State<_ProfileTab> {
   void _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
     
-    String finalVideoUrl = '';
-    if (_uploadedVideoBase64.isNotEmpty) {
-      finalVideoUrl = _uploadedVideoBase64;
-    } else if (_heroVideoUrlCtrl.text.startsWith('[Uploaded Video File')) {
-      finalVideoUrl = Get.find<PortfolioController>().profile.value?.heroVideoUrl ?? '';
-    } else {
-      finalVideoUrl = _heroVideoUrlCtrl.text.trim();
-    }
-
     final updatedProfile = Profile(
       name: _nameCtrl.text.trim(),
       title: _titleCtrl.text.trim(),
@@ -387,7 +378,7 @@ class _ProfileTabState extends State<_ProfileTab> {
       location: _locationCtrl.text.trim(),
       githubUrl: _githubUrlCtrl.text.trim(),
       linkedinUrl: _linkedinUrlCtrl.text.trim(),
-      heroVideoUrl: finalVideoUrl,
+      heroVideoUrl: _heroVideoUrlCtrl.text.trim(),
     );
 
     final success = await Get.find<AdminController>().updateProfile(updatedProfile);
@@ -555,94 +546,13 @@ class _ProfileTabState extends State<_ProfileTab> {
               validator: (v) => v!.isEmpty ? 'Required' : null,
             ),
             const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _heroVideoUrlCtrl,
-                    readOnly: _heroVideoUrlCtrl.text.startsWith('[Uploaded Video File'),
-                    decoration: InputDecoration(
-                      labelText: "Hero Background Video (Upload or Paste Link)",
-                      prefixIcon: const Icon(Icons.video_library_rounded),
-                      helperText: _heroVideoUrlCtrl.text.startsWith('[Uploaded Video File')
-                          ? "Video file is loaded. Click Save Details to update background or Delete to change."
-                          : "Upload a video file directly from your PC/Mobile or paste a video URL.",
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.video_file_rounded),
-                    label: const Text("Upload Video File"),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    ),
-                    onPressed: () async {
-                      final picked = await pickVideoFile();
-                      if (picked != null) {
-                        final sizeMb = (picked.size / (1024 * 1024)).toStringAsFixed(1);
-                        Get.snackbar(
-                          'Uploading Video ($sizeMb MB)...',
-                          'Please wait while video is uploading to server...',
-                          backgroundColor: Colors.blueAccent,
-                          colorText: Colors.white,
-                          duration: const Duration(seconds: 10),
-                        );
-
-                        final videoUrl = await Get.find<AdminController>().uploadVideo(
-                          picked.bytes,
-                          mimeType: picked.mimeType,
-                        );
-
-                        if (videoUrl != null) {
-                          setState(() {
-                            _uploadedVideoBase64 = '';
-                            _heroVideoUrlCtrl.text = videoUrl;
-                          });
-                          Get.snackbar(
-                            'Upload Complete!',
-                            'Video uploaded successfully. Click Save Details to apply.',
-                            backgroundColor: Colors.green,
-                            colorText: Colors.white,
-                          );
-                        } else {
-                          final base64Video = 'data:${picked.mimeType};base64,${base64Encode(picked.bytes)}';
-                          setState(() {
-                            _uploadedVideoBase64 = base64Video;
-                            _heroVideoUrlCtrl.text = '[Uploaded Video File: $sizeMb MB]';
-                          });
-                          Get.snackbar(
-                            'Video File Loaded ($sizeMb MB)',
-                            'Video ready. Click Save Details below to save and update background.',
-                            backgroundColor: Colors.deepOrange,
-                            colorText: Colors.white,
-                            duration: const Duration(seconds: 5),
-                          );
-                        }
-                      }
-                    },
-                  ),
-                ),
-                if (_heroVideoUrlCtrl.text.isNotEmpty || _uploadedVideoBase64.isNotEmpty) ...[
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: IconButton(
-                      icon: const Icon(Icons.delete_forever_rounded, color: Colors.redAccent),
-                      tooltip: "Remove Video",
-                      onPressed: () {
-                        setState(() {
-                          _uploadedVideoBase64 = '';
-                          _heroVideoUrlCtrl.clear();
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ],
+            TextFormField(
+              controller: _heroVideoUrlCtrl,
+              decoration: const InputDecoration(
+                labelText: "Hero Background Video URL (Google Drive or Direct Video Link)",
+                prefixIcon: Icon(Icons.video_library_rounded),
+                helperText: "Paste your Google Drive video share link or direct MP4 video link here.",
+              ),
             ),
             const SizedBox(height: 32),
             

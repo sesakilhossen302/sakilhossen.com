@@ -855,7 +855,14 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
     String url = widget.videoUrl.trim();
     if (url.isEmpty) return;
 
-    if (url.startsWith('/uploads')) {
+    if (url.contains('drive.google.com')) {
+      final regExp = RegExp(r'/(?:file/d/|open\?id=)([a-zA-Z0-9_-]+)');
+      final match = regExp.firstMatch(url);
+      if (match != null && match.group(1) != null) {
+        final fileId = match.group(1);
+        url = 'https://drive.google.com/uc?export=download&id=$fileId';
+      }
+    } else if (url.startsWith('/uploads')) {
       final apiHost = PortfolioController.apiHost;
       final baseUrl = apiHost.replaceAll(RegExp(r'/api/?$'), '');
       url = '$baseUrl$url';
