@@ -852,8 +852,14 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
   }
 
   void _initVideo() async {
-    final url = widget.videoUrl.trim();
+    String url = widget.videoUrl.trim();
     if (url.isEmpty) return;
+
+    if (url.startsWith('/uploads')) {
+      final apiHost = PortfolioController.apiHost;
+      final baseUrl = apiHost.replaceAll(RegExp(r'/api/?$'), '');
+      url = '$baseUrl$url';
+    }
 
     try {
       final uri = Uri.parse(url);
