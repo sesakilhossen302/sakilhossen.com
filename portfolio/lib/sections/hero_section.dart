@@ -195,9 +195,7 @@ class _HeroTextContent extends StatelessWidget {
               Text(
                 tagline,
                 style: GoogleFonts.inter(
-                  color: isDark
-                      ? const Color(0xFF10B981)
-                      : PortfolioTheme.primary,
+                  color: const Color(0xFF10B981),
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -214,7 +212,7 @@ class _HeroTextContent extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: alignCenter ? 24 : 32,
             fontWeight: FontWeight.w500,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+            color: const Color(0xFFCBD5E1),
           ),
         ),
         ShaderMask(
@@ -251,7 +249,11 @@ class _HeroTextContent extends StatelessWidget {
           child: Text(
             bio,
             textAlign: textAlign,
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              height: 1.6,
+              color: const Color(0xFF94A3B8),
+            ),
           ),
         ),
         const SizedBox(height: 36),
@@ -352,7 +354,7 @@ class _AnimatedHeroButtonState extends State<_AnimatedHeroButton> {
               : Border.all(
                   color: _isHovered
                       ? PortfolioTheme.primary
-                      : (isDark ? PortfolioTheme.borderDark : Colors.black26),
+                      : Colors.white38,
                   width: 1.5,
                 ),
           boxShadow: widget.isPrimary && _isHovered
@@ -363,9 +365,7 @@ class _AnimatedHeroButtonState extends State<_AnimatedHeroButton> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
-            foregroundColor: widget.isPrimary
-                ? Colors.white
-                : (isDark ? Colors.white : PortfolioTheme.secondary),
+            foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
@@ -431,15 +431,13 @@ class _SocialIconState extends State<_SocialIcon> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: _isHovered
-                  ? PortfolioTheme.primary.withOpacity(0.15)
-                  : (isDark
-                        ? const Color(0x0CFFFFFF)
-                        : Colors.black.withOpacity(0.04)),
+                  ? PortfolioTheme.primary.withOpacity(0.25)
+                  : const Color(0x1AFFFFFF),
               shape: BoxShape.circle,
               border: Border.all(
                 color: _isHovered
-                    ? PortfolioTheme.primary
-                    : (isDark ? PortfolioTheme.borderDark : Colors.black12),
+                    ? PortfolioTheme.accent
+                    : Colors.white24,
                 width: 1,
               ),
             ),

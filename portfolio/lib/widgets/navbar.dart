@@ -24,20 +24,15 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
       return Container(
         height: 80,
         decoration: BoxDecoration(
-          color: isDark 
-              ? PortfolioTheme.bgDark.withOpacity(0.45) 
-              : PortfolioTheme.bgLight.withOpacity(0.45),
+          color: Colors.transparent,
           border: Border(
             bottom: BorderSide(
-              color: (isDark ? PortfolioTheme.borderDark : PortfolioTheme.borderLight).withOpacity(0.3),
+              color: (isDark ? PortfolioTheme.borderDark : PortfolioTheme.borderLight).withOpacity(0.25),
               width: 1,
             ),
           ),
         ),
-        child: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Padding(
+        child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: ResponsiveWidget.isDesktop(context) 
                     ? MediaQuery.of(context).size.width * 0.08 
@@ -58,7 +53,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                             style: GoogleFonts.outfit(
                               fontSize: 22,
                               fontWeight: FontWeight.w800,
-                              color: isDark ? Colors.white : PortfolioTheme.secondary,
+                              color: Colors.white,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -99,7 +94,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                       IconButton(
                         icon: Icon(
                           isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                          color: isDark ? Colors.yellowAccent : PortfolioTheme.secondary,
+                          color: isDark ? Colors.yellowAccent : Colors.amberAccent,
                         ),
                         tooltip: 'Toggle Theme',
                         onPressed: controller.toggleTheme,
@@ -110,7 +105,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                       IconButton(
                         icon: Icon(
                           Icons.admin_panel_settings_rounded,
-                          color: isDark ? PortfolioTheme.accent : PortfolioTheme.primary,
+                          color: PortfolioTheme.accent,
                         ),
                         tooltip: 'Admin Panel',
                         onPressed: () => Get.toNamed('/admin'),
@@ -120,9 +115,9 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                       if (!isDesktop) ...[
                         const SizedBox(width: 8),
                         IconButton(
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.menu_rounded,
-                            color: isDark ? Colors.white : PortfolioTheme.secondary,
+                            color: Colors.white,
                           ),
                           onPressed: () {
                             Scaffold.of(context).openEndDrawer();
@@ -134,8 +129,6 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
             ),
-          ),
-        ),
       );
     });
   }
@@ -162,11 +155,10 @@ class _NavLinkState extends State<_NavLink> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PortfolioController>();
-    final isDark = controller.isDarkMode.value;
 
-    final Color normalColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569);
-    final Color activeColor = isDark ? Colors.white : PortfolioTheme.primary;
-    final Color hoverColor = isDark ? PortfolioTheme.accent : PortfolioTheme.primary;
+    final Color normalColor = const Color(0xFFCBD5E1);
+    final Color activeColor = Colors.white;
+    final Color hoverColor = PortfolioTheme.accent;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
