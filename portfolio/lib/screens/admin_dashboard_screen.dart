@@ -529,13 +529,60 @@ class _ProfileTabState extends State<_ProfileTab> {
               validator: (v) => v!.isEmpty ? 'Required' : null,
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _heroVideoUrlCtrl,
-              decoration: const InputDecoration(
-                labelText: "Hero Background Video URL (MP4 / WebM Link)",
-                prefixIcon: Icon(Icons.video_library_rounded),
-                helperText: "Paste a direct MP4/WebM video URL to loop in the background of the Hero section across all devices.",
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _heroVideoUrlCtrl,
+                    decoration: const InputDecoration(
+                      labelText: "Hero Background Video (Upload or Paste Link)",
+                      prefixIcon: Icon(Icons.video_library_rounded),
+                      helperText: "Upload a video file directly from your PC/Mobile or paste a video URL.",
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.video_file_rounded),
+                    label: const Text("Upload Video File"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    ),
+                    onPressed: () async {
+                      final videoData = await pickVideoAsBase64();
+                      if (videoData != null) {
+                        setState(() {
+                          _heroVideoUrlCtrl.text = videoData;
+                        });
+                        Get.snackbar(
+                          'Video Loaded',
+                          'Video file selected. Click Save Details to update live background.',
+                          backgroundColor: Colors.green,
+                          colorText: Colors.white,
+                        );
+                      }
+                    },
+                  ),
+                ),
+                if (_heroVideoUrlCtrl.text.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: IconButton(
+                      icon: const Icon(Icons.delete_forever_rounded, color: Colors.redAccent),
+                      tooltip: "Remove Video",
+                      onPressed: () {
+                        setState(() {
+                          _heroVideoUrlCtrl.clear();
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 32),
             
