@@ -835,11 +835,14 @@ class _BackgroundVideoPlayer extends StatefulWidget {
 class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
   VideoPlayerController? _controller;
   bool _isInitialized = false;
+  List<String> _videoPlaylist = [];
+  int _currentVideoIndex = 0;
+  bool _isTransitioning = false;
 
   @override
   void initState() {
     super.initState();
-    _initVideo();
+    _parsePlaylistAndStart();
   }
 
   @override
@@ -847,13 +850,29 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.videoUrl != widget.videoUrl) {
       _disposeVideo();
-      _initVideo();
+      _parsePlaylistAndStart();
     }
   }
 
-  void _initVideo() async {
-    String url = widget.videoUrl.trim();
-    if (url.isEmpty) return;
+  void _parsePlaylistAndStart() {
+    final raw = widget.videoUrl.trim();
+    if (raw.isEmpty) return;
+
+    _videoPlaylist = raw
+        .split(RegExp(r'[\n,;]+'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    _currentVideoIndex = 0;
+    if (_videoPlaylist.isNotEmpty) {
+      _loadAndPlayCurrentVideo();
+    }
+  }
+
+  String _resolveVideoUrl(String rawUrl) {
+    String url = rawUrl.trim();
+    if (url.isEmpty) return '';
 
     if (url.contains('drive.google.com')) {
       final regExp = RegExp(r'/(?:file/d/|open\?id=)([a-zA-Z0-9_-]+)');
@@ -867,14 +886,32 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
       final baseUrl = apiHost.replaceAll(RegExp(r'/api/?$'), '');
       url = '$baseUrl$url';
     }
+    return url;
+  }
+
+  void _loadAndPlayCurrentVideo() async {
+    if (_videoPlaylist.isEmpty) return;
+
+    final targetUrl = _resolveVideoUrl(_videoPlaylist[_currentVideoIndex]);
+    if (targetUrl.isEmpty) {
+      _advanceNextVideo();
+      return;
+    }
 
     try {
-      final uri = Uri.parse(url);
+      final uri = Uri.parse(targetUrl);
       _controller = VideoPlayerController.networkUrl(uri)
-        ..setVolume(0.0)
-        ..setLooping(true);
+        ..setVolume(0.0);
 
       await _controller!.initialize();
+
+      if (_videoPlaylist.length == 1) {
+        _controller!.setLooping(true);
+      } else {
+        _controller!.setLooping(false);
+        _controller!.addListener(_videoListener);
+      }
+
       if (mounted) {
         setState(() {
           _isInitialized = true;
@@ -882,11 +919,33 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
         _controller!.play();
       }
     } catch (e) {
-      debugPrint('Background video initialization failed: $e');
+      debugPrint('Background video initialization failed for $targetUrl: $e');
+      _advanceNextVideo();
     }
   }
 
+  void _videoListener() {
+    if (_controller == null || !_controller!.value.isInitialized || _isTransitioning) return;
+    
+    final position = _controller!.value.position;
+    final duration = _controller!.value.duration;
+
+    if (duration.inMilliseconds > 0 && position >= duration) {
+      _isTransitioning = true;
+      _advanceNextVideo();
+    }
+  }
+
+  void _advanceNextVideo() {
+    if (_videoPlaylist.length <= 1) return;
+    _disposeVideo();
+    _currentVideoIndex = (_currentVideoIndex + 1) % _videoPlaylist.length;
+    _isTransitioning = false;
+    _loadAndPlayCurrentVideo();
+  }
+
   void _disposeVideo() {
+    _controller?.removeListener(_videoListener);
     _controller?.pause();
     _controller?.dispose();
     _controller = null;

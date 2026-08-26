@@ -548,10 +548,12 @@ class _ProfileTabState extends State<_ProfileTab> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _heroVideoUrlCtrl,
+              maxLines: 3,
+              minLines: 1,
               decoration: const InputDecoration(
-                labelText: "Hero Background Video URL (Google Drive or Direct Video Link)",
+                labelText: "Hero Background Video Playlist URLs (Google Drive / Direct Links)",
                 prefixIcon: Icon(Icons.video_library_rounded),
-                helperText: "Paste your Google Drive video share link or direct MP4 video link here.",
+                helperText: "Add multiple video links (one URL per line or separated by commas). They will play sequentially one after another in a loop!",
               ),
             ),
             const SizedBox(height: 32),
