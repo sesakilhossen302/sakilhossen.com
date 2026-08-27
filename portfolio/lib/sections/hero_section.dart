@@ -899,10 +899,33 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
   int _currentVideoIndex = 0;
   bool _isTransitioning = false;
   Worker? _muteWorker;
+  late final AppLifecycleListener _lifecycleListener;
 
   @override
   void initState() {
     super.initState();
+    _lifecycleListener = AppLifecycleListener(
+      onPause: () {
+        _controller?.pause();
+      },
+      onInactive: () {
+        _controller?.pause();
+      },
+      onHide: () {
+        _controller?.pause();
+      },
+      onShow: () {
+        if (_isInitialized && _controller != null && !_controller!.value.isPlaying) {
+          _controller?.play();
+        }
+      },
+      onResume: () {
+        if (_isInitialized && _controller != null && !_controller!.value.isPlaying) {
+          _controller?.play();
+        }
+      },
+    );
+
     final portfolioCtrl = Get.find<PortfolioController>();
     _muteWorker = ever(portfolioCtrl.isVideoMuted, (bool isMuted) async {
       if (_controller != null && _controller!.value.isInitialized) {
@@ -1041,6 +1064,7 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
 
   @override
   void dispose() {
+    _lifecycleListener.dispose();
     _muteWorker?.dispose();
     _disposeVideo();
     super.dispose();
