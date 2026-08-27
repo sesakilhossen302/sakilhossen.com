@@ -9,6 +9,7 @@ import '../theme/portfolio_theme.dart';
 import '../widgets/responsive_widget.dart';
 import '../widgets/portfolio_image.dart';
 import '../widgets/iframe_video_player.dart';
+import '../utils/tab_visibility_helper.dart';
 
 class HeroSection extends StatelessWidget {
   final VoidCallback onContactTap;
@@ -926,6 +927,20 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
       },
     );
 
+    TabVisibilityHelper.listen((bool isHidden) async {
+      if (_controller != null && _controller!.value.isInitialized) {
+        if (isHidden) {
+          await _controller!.pause();
+        } else {
+          final portfolioCtrl = Get.find<PortfolioController>();
+          if (!portfolioCtrl.isVideoMuted.value) {
+            await _controller!.setVolume(1.0);
+          }
+          await _controller!.play();
+        }
+      }
+    });
+
     final portfolioCtrl = Get.find<PortfolioController>();
     _muteWorker = ever(portfolioCtrl.isVideoMuted, (bool isMuted) async {
       if (_controller != null && _controller!.value.isInitialized) {
@@ -1064,6 +1079,7 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
 
   @override
   void dispose() {
+    TabVisibilityHelper.stop();
     _lifecycleListener.dispose();
     _muteWorker?.dispose();
     _disposeVideo();
