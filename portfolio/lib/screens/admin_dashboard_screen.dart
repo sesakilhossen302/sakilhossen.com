@@ -7,7 +7,11 @@ import '../theme/portfolio_theme.dart';
 import 'admin/widgets/admin_sidebar.dart';
 import 'admin/widgets/admin_stats_header.dart';
 import 'admin/tabs/admin_inbox_tab.dart';
-import 'admin/tabs/admin_profile_tab.dart';
+import 'admin/tabs/admin_profile_identity_tab.dart';
+import 'admin/tabs/admin_contact_links_tab.dart';
+import 'admin/tabs/admin_hero_video_tab.dart';
+import 'admin/tabs/admin_bio_stats_tab.dart';
+import 'admin/tabs/admin_security_tab.dart';
 import 'admin/tabs/admin_projects_tab.dart';
 import 'admin/tabs/admin_reviews_tab.dart';
 import 'admin/tabs/admin_education_tab.dart';
@@ -45,7 +49,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
       final tabViews = [
         AdminInboxTab(isDark: isDark),
-        AdminProfileTab(isDark: isDark),
+        AdminProfileIdentityTab(isDark: isDark),
+        AdminContactLinksTab(isDark: isDark),
+        AdminHeroVideoTab(isDark: isDark),
+        AdminBioStatsTab(isDark: isDark),
+        AdminSecurityTab(isDark: isDark),
         AdminProjectsTab(isDark: isDark),
         AdminReviewsTab(isDark: isDark),
         AdminEducationTab(isDark: isDark),

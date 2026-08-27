@@ -22,12 +22,16 @@ class AdminSidebar extends StatelessWidget {
 
   static const List<Map<String, dynamic>> menuItems = [
     {'icon': Icons.mail_outline_rounded, 'label': 'Inbox Messages', 'badgeKey': 'inbox'},
-    {'icon': Icons.person_outline_rounded, 'label': 'Edit Profile'},
+    {'icon': Icons.person_outline_rounded, 'label': 'Profile & Identity'},
+    {'icon': Icons.contact_phone_outlined, 'label': 'Contact & Links'},
+    {'icon': Icons.video_library_outlined, 'label': 'Hero Video Playlist'},
+    {'icon': Icons.psychology_outlined, 'label': 'Bio & Key Stats'},
+    {'icon': Icons.shield_outlined, 'label': 'Admin Security'},
     {'icon': Icons.folder_copy_outlined, 'label': 'Manage Projects'},
-    {'icon': Icons.star_outline_rounded, 'label': 'Client Reviews'},
+    {'icon': Icons.star_outline_rounded, 'label': 'Client Testimonials'},
     {'icon': Icons.school_outlined, 'label': 'Education'},
     {'icon': Icons.work_outline_rounded, 'label': 'Work Experience'},
-    {'icon': Icons.psychology_outlined, 'label': 'Skills Category'},
+    {'icon': Icons.extension_outlined, 'label': 'Skills Category'},
     {'icon': Icons.auto_awesome_outlined, 'label': 'AI Workflow'},
   ];
 
@@ -133,7 +137,7 @@ class AdminSidebar extends StatelessWidget {
                   }
 
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 6),
+                    margin: const EdgeInsets.only(bottom: 4),
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
@@ -146,7 +150,7 @@ class AdminSidebar extends StatelessWidget {
                         },
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? PortfolioTheme.primary.withOpacity(isDark ? 0.2 : 0.1)
@@ -161,7 +165,7 @@ class AdminSidebar extends StatelessWidget {
                             children: [
                               Icon(
                                 item['icon'] as IconData,
-                                size: 20,
+                                size: 18,
                                 color: isSelected
                                     ? PortfolioTheme.primary
                                     : (isDark ? Colors.white70 : Colors.black54),
@@ -171,7 +175,7 @@ class AdminSidebar extends StatelessWidget {
                                 child: Text(
                                   item['label'] as String,
                                   style: GoogleFonts.outfit(
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                                     color: isSelected
                                         ? PortfolioTheme.primary
