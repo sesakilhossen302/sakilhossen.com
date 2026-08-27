@@ -903,10 +903,10 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
 
     try {
       final uri = Uri.parse(targetUrl);
-      _controller = VideoPlayerController.networkUrl(uri)
-        ..setVolume(_isMuted ? 0.0 : 1.0);
+      _controller = VideoPlayerController.networkUrl(uri);
 
       await _controller!.initialize();
+      await _controller!.setVolume(_isMuted ? 0.0 : 1.0);
 
       if (_videoPlaylist.length == 1) {
         _controller!.setLooping(true);
@@ -919,7 +919,7 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
         setState(() {
           _isInitialized = true;
         });
-        _controller!.play();
+        await _controller!.play();
       }
     } catch (e) {
       debugPrint('Background video initialization failed for $targetUrl: $e');
@@ -995,11 +995,18 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(30),
-              onTap: () {
+              onTap: () async {
                 setState(() {
                   _isMuted = !_isMuted;
-                  _controller?.setVolume(_isMuted ? 0.0 : 1.0);
                 });
+                if (_controller != null) {
+                  if (_isMuted) {
+                    await _controller!.setVolume(0.0);
+                  } else {
+                    await _controller!.setVolume(1.0);
+                    await _controller!.play();
+                  }
+                }
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
