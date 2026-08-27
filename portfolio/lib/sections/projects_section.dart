@@ -67,9 +67,9 @@ class ProjectsSection extends StatelessWidget {
               builder: (context, constraints) {
                 final double width = constraints.maxWidth;
                 int crossAxisCount = 1;
-                if (width >= 1100) {
+                if (width >= 900) {
                   crossAxisCount = 3;
-                } else if (width >= 700) {
+                } else if (width >= 600) {
                   crossAxisCount = 2;
                 }
 
