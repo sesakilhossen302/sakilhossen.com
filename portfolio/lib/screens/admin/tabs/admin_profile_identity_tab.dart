@@ -155,7 +155,10 @@ class _AdminProfileIdentityTabState extends State<AdminProfileIdentityTab> {
               style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Row(
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 16,
+              runSpacing: 12,
               children: [
                 CircleAvatar(
                   radius: 40,
@@ -168,7 +171,6 @@ class _AdminProfileIdentityTabState extends State<AdminProfileIdentityTab> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 20),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -184,8 +186,7 @@ class _AdminProfileIdentityTabState extends State<AdminProfileIdentityTab> {
                     }
                   },
                 ),
-                if (_profileImage.isNotEmpty) ...[
-                  const SizedBox(width: 12),
+                if (_profileImage.isNotEmpty)
                   TextButton.icon(
                     icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
                     label: const Text("Remove", style: TextStyle(color: Colors.redAccent)),
@@ -195,7 +196,6 @@ class _AdminProfileIdentityTabState extends State<AdminProfileIdentityTab> {
                       });
                     },
                   ),
-                ],
               ],
             ),
             const SizedBox(height: 32),
