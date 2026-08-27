@@ -137,9 +137,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   // Top Stats Summary Cards
                   Padding(
                     padding: EdgeInsets.only(
-                      left: isDesktop ? 24 : 0,
-                      right: isDesktop ? 24 : 0,
-                      top: isDesktop ? 24 : 12,
+                      left: isDesktop ? 20 : 0,
+                      right: isDesktop ? 20 : 0,
+                      top: isDesktop ? 16 : 8,
                     ),
                     child: AdminStatsHeader(
                       isDark: isDark,

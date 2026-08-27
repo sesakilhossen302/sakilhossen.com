@@ -19,7 +19,7 @@ class AdminStatsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final adminController = Get.find<AdminController>();
     final portfolioController = Get.find<PortfolioController>();
-    final isDesktop = MediaQuery.of(context).size.width >= 768;
+    final width = MediaQuery.of(context).size.width;
 
     return Obx(() {
       final messageCount = adminController.inboxMessages.length;
@@ -34,7 +34,6 @@ class AdminStatsHeader extends StatelessWidget {
           icon: Icons.mail_outline_rounded,
           color: const Color(0xFF06B6D4),
           isDark: isDark,
-          isDesktop: isDesktop,
           onTap: () => onTabSelected(0),
         ),
         _StatCard(
@@ -44,7 +43,6 @@ class AdminStatsHeader extends StatelessWidget {
           icon: Icons.folder_copy_outlined,
           color: const Color(0xFF3B82F6),
           isDark: isDark,
-          isDesktop: isDesktop,
           onTap: () => onTabSelected(6),
         ),
         _StatCard(
@@ -54,7 +52,6 @@ class AdminStatsHeader extends StatelessWidget {
           icon: Icons.star_outline_rounded,
           color: const Color(0xFFF59E0B),
           isDark: isDark,
-          isDesktop: isDesktop,
           onTap: () => onTabSelected(7),
         ),
         _StatCard(
@@ -64,31 +61,31 @@ class AdminStatsHeader extends StatelessWidget {
           icon: Icons.cloud_done_outlined,
           color: const Color(0xFF10B981),
           isDark: isDark,
-          isDesktop: isDesktop,
           onTap: () {},
         ),
       ];
 
-      if (!isDesktop) {
-        // Mobile horizontal scroll row (Compact 75px height)
+      // Single-line horizontal scroll for screens < 1200px (height 76px)
+      if (width < 1200) {
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
-          height: 75,
+          height: 76,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             itemCount: cards.length,
             separatorBuilder: (context, index) => const SizedBox(width: 12),
-            itemBuilder: (context, index) => cards[index],
+            itemBuilder: (context, index) => SizedBox(width: 210, child: cards[index]),
           ),
         );
       }
 
-      // Desktop 4-column row
+      // Full 4-Column Single-Row Desktop View
       return Container(
-        margin: const EdgeInsets.only(bottom: 24),
+        margin: const EdgeInsets.only(bottom: 16),
+        height: 80,
         child: Row(
-          children: cards.map((c) => Expanded(child: Padding(padding: const EdgeInsets.only(right: 16), child: c))).toList(),
+          children: cards.map((c) => Expanded(child: Padding(padding: const EdgeInsets.only(right: 12), child: c))).toList(),
         ),
       );
     });
@@ -102,7 +99,6 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final bool isDark;
-  final bool isDesktop;
   final VoidCallback onTap;
 
   const _StatCard({
@@ -112,98 +108,28 @@ class _StatCard extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.isDark,
-    required this.isDesktop,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (!isDesktop) {
-      // Compact Mobile Card
-      return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onTap,
-          child: Container(
-            width: 170,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: isDark ? PortfolioTheme.surfaceDark.withOpacity(0.6) : Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: isDark ? Colors.white12 : Colors.black.withOpacity(0.08),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.08),
-                  blurRadius: 8,
-                  spreadRadius: 1,
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(icon, color: color, size: 18),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: isDark ? Colors.white60 : Colors.black54,
-                        ),
-                      ),
-                      Text(
-                        value,
-                        style: GoogleFonts.outfit(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : PortfolioTheme.secondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Full Desktop Card
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: isDark ? PortfolioTheme.surfaceDark.withOpacity(0.6) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isDark ? Colors.white12 : Colors.black.withOpacity(0.08),
             ),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.08),
-                blurRadius: 12,
+                color: color.withOpacity(0.06),
+                blurRadius: 8,
                 spreadRadius: 1,
               ),
             ],
@@ -211,44 +137,53 @@ class _StatCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, color: color, size: 24),
+                child: Icon(icon, color: color, size: 20),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w500,
                         color: isDark ? Colors.white60 : Colors.black54,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      value,
-                      style: GoogleFonts.outfit(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : PortfolioTheme.secondary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: color,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          value,
+                          style: GoogleFonts.outfit(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : PortfolioTheme.secondary,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: color,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
