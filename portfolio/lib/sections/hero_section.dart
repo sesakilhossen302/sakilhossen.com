@@ -291,7 +291,6 @@ class _HeroTextContent extends StatelessWidget {
               isPrimary: false,
               onPressed: () => _launchUrl(cvUrl),
             ),
-            const _SoundToggleButton(),
           ],
         ),
         const SizedBox(height: 40),
@@ -990,7 +989,13 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
         setState(() {
           _isInitialized = true;
         });
-        await _controller!.play();
+        try {
+          await _controller!.play();
+        } catch (e) {
+          debugPrint('Autoplay with sound blocked by browser, falling back to muted play: $e');
+          await _controller!.setVolume(0.0);
+          await _controller!.play();
+        }
       }
     } catch (e) {
       debugPrint('Background video initialization failed for $targetUrl: $e');

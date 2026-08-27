@@ -23,7 +23,7 @@ class PortfolioController extends GetxController {
 
   final RxBool isLoading = true.obs;
   final RxBool isDarkMode = true.obs;
-  final RxBool isVideoMuted = false.obs;
+  final RxBool isVideoMuted = true.obs;
 
   void toggleVideoMute() {
     isVideoMuted.value = !isVideoMuted.value;
