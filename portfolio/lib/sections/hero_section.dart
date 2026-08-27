@@ -839,7 +839,6 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
   List<String> _videoPlaylist = [];
   int _currentVideoIndex = 0;
   bool _isTransitioning = false;
-  String _gDriveEmbedUrl = '';
 
   @override
   void initState() {
@@ -872,24 +871,19 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
     }
   }
 
-  String _getGoogleDrivePreviewUrl(String rawUrl) {
-    final url = rawUrl.trim();
+  String _resolveVideoUrl(String rawUrl) {
+    String url = rawUrl.trim();
+    if (url.isEmpty) return '';
+
     if (url.contains('drive.google.com')) {
       final regExp = RegExp(r'/(?:file/d/|open\?id=)([a-zA-Z0-9_-]+)');
       final match = regExp.firstMatch(url);
       if (match != null && match.group(1) != null) {
         final fileId = match.group(1);
-        return 'https://drive.google.com/file/d/$fileId/preview';
+        final apiHost = PortfolioController.apiHost;
+        url = '$apiHost/video-proxy/$fileId';
       }
-    }
-    return '';
-  }
-
-  String _resolveVideoUrl(String rawUrl) {
-    String url = rawUrl.trim();
-    if (url.isEmpty) return '';
-
-    if (url.startsWith('/uploads')) {
+    } else if (url.startsWith('/uploads')) {
       final apiHost = PortfolioController.apiHost;
       final baseUrl = apiHost.replaceAll(RegExp(r'/api/?$'), '');
       url = '$baseUrl$url';
@@ -900,21 +894,7 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
   void _loadAndPlayCurrentVideo() async {
     if (_videoPlaylist.isEmpty) return;
 
-    final rawItem = _videoPlaylist[_currentVideoIndex];
-    final gDriveUrl = _getGoogleDrivePreviewUrl(rawItem);
-
-    if (gDriveUrl.isNotEmpty) {
-      if (mounted) {
-        setState(() {
-          _gDriveEmbedUrl = gDriveUrl;
-          _isInitialized = true;
-        });
-      }
-      return;
-    }
-
-    _gDriveEmbedUrl = '';
-    final targetUrl = _resolveVideoUrl(rawItem);
+    final targetUrl = _resolveVideoUrl(_videoPlaylist[_currentVideoIndex]);
     if (targetUrl.isEmpty) {
       _advanceNextVideo();
       return;
@@ -971,7 +951,6 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
     _controller?.pause();
     _controller?.dispose();
     _controller = null;
-    _gDriveEmbedUrl = '';
     _isInitialized = false;
   }
 
@@ -983,20 +962,9 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_isInitialized) {
+    if (!_isInitialized || _controller == null) {
       return const SizedBox.shrink();
     }
-
-    if (_gDriveEmbedUrl.isNotEmpty) {
-      return Transform.scale(
-        scale: 1.3,
-        child: IgnorePointer(
-          child: IframeVideoPlayer(embedUrl: _gDriveEmbedUrl),
-        ),
-      );
-    }
-
-    if (_controller == null) return const SizedBox.shrink();
 
     return FittedBox(
       fit: BoxFit.cover,
