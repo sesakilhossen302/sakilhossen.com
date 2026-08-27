@@ -101151,10 +101151,10 @@ A.a8T.prototype={
 $0(){return this.a.d.$1(0)},
 $S:0}
 A.a8U.prototype={
-$0(){return this.a.d.$1(2)},
+$0(){return this.a.d.$1(6)},
 $S:0}
 A.a8V.prototype={
-$0(){return this.a.d.$1(3)},
+$0(){return this.a.d.$1(7)},
 $S:0}
 A.a8W.prototype={
 $0(){},
@@ -101193,7 +101193,7 @@ $0(){var s,r,q,p,o,n,m,l,k,j,i,h=null,g=this.a
 if(!g.e.ch.gn(0)){$.a_.R8$.push(new A.awr())
 return B.UX}s=g.f
 r=s.dy.gn(0)
-q=A.aT(this.b,h,t.w).w.a.a>=900
+q=A.aT(this.b,h,t.w).w.a.a>=768
 p=r?B.cl:B.dI
 o=!q
 n=o?A.aQC(h,new A.AA(g.d,new A.aws(g),r,!0,h)):h
