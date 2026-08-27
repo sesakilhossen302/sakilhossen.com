@@ -46,8 +46,10 @@ class HeroSection extends StatelessWidget {
           // 2. Dark Overlay for High Text Readability
           if (heroVideoUrl.isNotEmpty)
             Positioned.fill(
-              child: Container(
-                color: (isDark ? Colors.black : Colors.black87).withOpacity(0.65),
+              child: IgnorePointer(
+                child: Container(
+                  color: (isDark ? Colors.black : Colors.black87).withOpacity(0.65),
+                ),
               ),
             ),
 
@@ -88,7 +90,7 @@ class HeroSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    flex: 4,
+                    flex: 5,
                     child: _HeroTextContent(
                       name: name,
                       title: title,
@@ -101,6 +103,7 @@ class HeroSection extends StatelessWidget {
                       isDark: isDark,
                     ),
                   ),
+                  const SizedBox(width: 40),
                   Expanded(
                     flex: 3,
                     child: Center(
@@ -113,6 +116,64 @@ class HeroSection extends StatelessWidget {
               ),
             ),
           ),
+
+          // 4. Top-layer Floating Sound Control Button (100% Clickable!)
+          if (heroVideoUrl.isNotEmpty)
+            Positioned(
+              bottom: 25,
+              right: 25,
+              child: Obx(() {
+                final isMuted = controller.isVideoMuted.value;
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(30),
+                    onTap: () {
+                      controller.toggleVideoMute();
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.85),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: isMuted ? Colors.white38 : PortfolioTheme.accent,
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (isMuted ? Colors.black : PortfolioTheme.accent).withOpacity(0.5),
+                            blurRadius: 12,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                            color: isMuted ? Colors.grey[300] : PortfolioTheme.accent,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            isMuted ? "Sound Off (Tap for Audio 🔊)" : "Sound On 🔊",
+                            style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
         ],
       );
     });
@@ -839,11 +900,20 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
   List<String> _videoPlaylist = [];
   int _currentVideoIndex = 0;
   bool _isTransitioning = false;
-  bool _isMuted = true;
+  Worker? _muteWorker;
 
   @override
   void initState() {
     super.initState();
+    final portfolioCtrl = Get.find<PortfolioController>();
+    _muteWorker = ever(portfolioCtrl.isVideoMuted, (bool isMuted) async {
+      if (_controller != null && _controller!.value.isInitialized) {
+        await _controller!.setVolume(isMuted ? 0.0 : 1.0);
+        if (!isMuted) {
+          await _controller!.play();
+        }
+      }
+    });
     _parsePlaylistAndStart();
   }
 
@@ -902,11 +972,13 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
     }
 
     try {
+      final portfolioCtrl = Get.find<PortfolioController>();
+      final isMuted = portfolioCtrl.isVideoMuted.value;
       final uri = Uri.parse(targetUrl);
       _controller = VideoPlayerController.networkUrl(uri);
 
       await _controller!.initialize();
-      await _controller!.setVolume(_isMuted ? 0.0 : 1.0);
+      await _controller!.setVolume(isMuted ? 0.0 : 1.0);
 
       if (_videoPlaylist.length == 1) {
         _controller!.setLooping(true);
@@ -965,6 +1037,7 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
 
   @override
   void dispose() {
+    _muteWorker?.dispose();
     _disposeVideo();
     super.dispose();
   }
@@ -975,82 +1048,14 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
       return const SizedBox.shrink();
     }
 
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: FittedBox(
-            fit: BoxFit.cover,
-            clipBehavior: Clip.hardEdge,
-            child: SizedBox(
-              width: _controller!.value.size.width,
-              height: _controller!.value.size.height,
-              child: VideoPlayer(_controller!),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 25,
-          right: 25,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(30),
-              onTap: () async {
-                setState(() {
-                  _isMuted = !_isMuted;
-                });
-                if (_controller != null) {
-                  if (_isMuted) {
-                    await _controller!.setVolume(0.0);
-                  } else {
-                    await _controller!.setVolume(1.0);
-                    await _controller!.play();
-                  }
-                }
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.75),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: _isMuted ? Colors.white38 : PortfolioTheme.accent,
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: (_isMuted ? Colors.black : PortfolioTheme.accent).withOpacity(0.4),
-                      blurRadius: 12,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
-                      color: _isMuted ? Colors.grey[300] : PortfolioTheme.accent,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _isMuted ? "Sound Off (Tap for Audio 🔊)" : "Sound On 🔊",
-                      style: GoogleFonts.outfit(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+    return FittedBox(
+      fit: BoxFit.cover,
+      clipBehavior: Clip.hardEdge,
+      child: SizedBox(
+        width: _controller!.value.size.width,
+        height: _controller!.value.size.height,
+        child: VideoPlayer(_controller!),
+      ),
     );
   }
 }

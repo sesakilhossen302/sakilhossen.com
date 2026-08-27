@@ -23,6 +23,11 @@ class PortfolioController extends GetxController {
 
   final RxBool isLoading = true.obs;
   final RxBool isDarkMode = true.obs;
+  final RxBool isVideoMuted = true.obs;
+
+  void toggleVideoMute() {
+    isVideoMuted.value = !isVideoMuted.value;
+  }
 
   // Active section for Navbar highlighting
   final RxInt activeSectionIndex = 0.obs;
