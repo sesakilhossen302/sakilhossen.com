@@ -102482,7 +102482,7 @@ r=s.aX(0,p,t.d)
 s=t.w
 q=A.aT(a,p,s).w
 A.aT(a,p,s).toString
-return new A.dk(new A.a7h(r,A.aT(a,p,s).w.a.a>=1100,q.a),p)}}
+return new A.dk(new A.a7h(r,A.aT(a,p,s).w.a.a>=768,q.a),p)}}
 A.a7h.prototype={
 $0(){var s,r,q,p,o,n,m,l,k,j=this,i=null,h=j.a,g=h.ax.gn(0),f=h.dy.gn(0)
 h=g==null
@@ -102560,7 +102560,7 @@ if(s==null)s=$.a0=B.u
 r=s.aX(0,p,t.d)
 s=t.w
 q=A.aT(a,p,s).w
-return new A.dk(new A.a7H(r,A.aT(a,p,s).w.a.a>=1100,q.a,a,new A.a7I()),p)}}
+return new A.dk(new A.a7H(r,A.aT(a,p,s).w.a.a>=768,q.a,a,new A.a7I()),p)}}
 A.a7I.prototype={
 $1(a){switch(a.toLowerCase()){case"code":return B.iE
 case"psychology":return B.Kw
@@ -102683,7 +102683,7 @@ $0(){var s,r,q,p,o,n,m=this,l=null,k="sakil@example.com",j="Dhaka, Bangladesh",i
 i=e==null
 s=i?l:e.z
 if(s==null)s="+880 1700-000000"
-f=f.a.a>=1100?m.d.a*0.08:24
+f=f.a.a>=768?m.d.a*0.08:24
 r=A.bp(l,l,B.o,l,l,new A.b0(l,l,l,A.ba(2),l,B.br,B.H),l,4,l,l,l,l,l,32)
 q=t.p
 r=A.bk(A.b([r,B.ca,A.ag("Contact Me",l,l,l,l,A.bt().$4$color$fontSize$fontWeight$letterSpacing(h?B.e:B.q,28,B.z,0.5),l,l)],q),B.r,B.n,B.p,0)
@@ -102732,7 +102732,7 @@ r=s.aX(0,o,t.d)
 s=t.w
 q=A.aT(a,o,s).w
 p=r.dy.gn(0)
-return new A.dk(new A.ac5(r,A.aT(a,o,s).w.a.a>=1100,q.a,p,a),o)}}
+return new A.dk(new A.ac5(r,A.aT(a,o,s).w.a.a>=768,q.a,p,a),o)}}
 A.ac5.prototype={
 $0(){var s,r,q,p,o=this,n=null,m=o.a.cx
 if(m.gA(0)===0)return B.hu
@@ -102804,7 +102804,7 @@ if(s==null)s=$.a0=B.u
 r=s.aX(0,p,t.d)
 s=t.w
 q=A.aT(a,p,s).w
-return new A.dk(new A.acH(r,A.aT(a,p,s).w.a.a>=1100,q.a,a),p)}}
+return new A.dk(new A.acH(r,A.aT(a,p,s).w.a.a>=768,q.a,a),p)}}
 A.acH.prototype={
 $0(){var s,r,q,p=this,o=null,n=p.a,m=n.CW,l=n.dy.gn(0)
 n=p.b?p.c.a*0.08:24
@@ -102945,7 +102945,7 @@ if(s==null)s=$.a0=B.u
 r=s.aX(0,p,t.d)
 s=t.w
 q=A.aT(a,p,s).w
-return new A.dk(new A.aft(this,r,A.aT(a,p,s).w.a.a<768,q.a,A.aT(a,p,s).w.a.a>=1100),p)}}
+return new A.dk(new A.aft(this,r,A.aT(a,p,s).w.a.a<768,q.a,A.aT(a,p,s).w.a.a>=768),p)}}
 A.aft.prototype={
 $0(){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b=this,a=null,a0=b.b,a1=a0.ax.gn(0),a2=a0.dy.gn(0)
 a0=a1==null
@@ -103505,7 +103505,7 @@ if(s==null)s=$.a0=B.u
 r=s.aX(0,p,t.d)
 s=t.w
 q=A.aT(a,p,s).w
-return new A.dk(new A.an2(this,r,A.aT(a,p,s).w.a.a>=1100,q.a,a),p)},
+return new A.dk(new A.an2(this,r,A.aT(a,p,s).w.a.a>=768,q.a,a),p)},
 apy(a,b,c){A.iy(A.T(153,B.l.m()>>>16&255,B.l.m()>>>8&255,B.l.m()&255),new A.amZ(b,c),a,t.z)}}
 A.an2.prototype={
 $0(){var s,r,q,p=this,o=null,n=p.b,m=n.ay
@@ -103518,8 +103518,8 @@ return A.bp(o,A.bz(A.b([A.bk(A.b([r,B.ca,A.ag("Featured Projects",o,o,o,o,A.bt()
 $S:55}
 A.an1.prototype={
 $2(a,b){var s,r,q=b.b
-if(q>=1100)s=3
-else s=q>=700?2:1
+if(q>=900)s=3
+else s=q>=600?2:1
 r=this.b
 return A.afg(new A.y5(s,28,24,340),new A.an0(this.a,r,this.c),J.bN(r.gn(0)),B.h8,!0)},
 $S:91}
@@ -103636,7 +103636,7 @@ r=s.aX(0,o,t.d)
 s=t.w
 q=A.aT(a,o,s).w
 p=r.dy.gn(0)
-return new A.dk(new A.anv(r,A.aT(a,o,s).w.a.a>=1100,q.a,p,a),o)}}
+return new A.dk(new A.anv(r,A.aT(a,o,s).w.a.a>=768,q.a,p,a),o)}}
 A.anv.prototype={
 $0(){var s,r,q,p,o=this,n=null,m=o.a.db
 if(m.gA(0)===0)return B.hu
@@ -103720,7 +103720,7 @@ if(s==null)s=$.a0=B.u
 r=s.aX(0,p,t.d)
 s=t.w
 q=A.aT(a,p,s).w
-return new A.dk(new A.arP(r,A.aT(a,p,s).w.a.a>=1100,q.a,a),p)}}
+return new A.dk(new A.arP(r,A.aT(a,p,s).w.a.a>=768,q.a,a),p)}}
 A.arP.prototype={
 $0(){var s,r,q,p=this,o=null,n=p.a,m=n.ch
 if(m.gA(0)===0)return B.hu
@@ -103844,13 +103844,13 @@ G(a){var s
 $.ak()
 s=$.a0
 if(s==null)s=$.a0=B.u
-return new A.dk(new A.al4(s.aX(0,null,t.d),a,A.aT(a,null,t.w).w.a.a>=1100),null)}}
+return new A.dk(new A.al4(s.aX(0,null,t.d),a,A.aT(a,null,t.w).w.a.a>=768),null)}}
 A.al4.prototype={
 $0(){var s,r,q,p,o,n,m=null,l=this.a,k=l.dy.gn(0),j=l.fx.gn(0),i=k?B.b4:B.bb
 i=A.T(64,i.m()>>>16&255,i.m()>>>8&255,i.m()&255)
 s=this.b
 r=t.w
-r=A.aT(s,m,r).w.a.a>=1100?A.aT(s,m,r).w.a.a*0.08:24
+r=A.aT(s,m,r).w.a.a>=768?A.aT(s,m,r).w.a.a*0.08:24
 q=t.p
 p=A.b([A.hr(m,A.dO(A.bk(A.b([A.ag("Sakil Hossen",m,m,m,m,A.bt().$4$color$fontSize$fontWeight$letterSpacing(B.e,22,B.c5,-0.5),m,m),A.bp(m,m,B.o,m,m,B.kl,m,6,m,B.Jr,m,m,m,6)],q),B.r,B.n,B.p,0),B.eX,m,m,m,m),B.x,!1,m,m,m,m,m,m,m,m,m,m,m,m,m,m,new A.al1(l),m,m,m,m,m,m)],q)
 o=this.c
@@ -104029,8 +104029,8 @@ A.TY.prototype={
 G(a){return A.p0(new A.aoJ(this))}}
 A.aoJ.prototype={
 $2(a,b){var s=b.b
-if(s>=1100)return this.a.e
-else if(s>=768)return this.a.c
+if(s>=1024)return this.a.e
+else if(s>=768)return this.a.e
 else return this.a.c},
 $S:662}
 A.y2.prototype={}
