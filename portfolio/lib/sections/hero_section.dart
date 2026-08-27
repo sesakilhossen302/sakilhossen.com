@@ -117,62 +117,12 @@ class HeroSection extends StatelessWidget {
             ),
           ),
 
-          // 4. Top-layer Floating Sound Control Button (100% Clickable!)
+          // 4. Top-layer Floating Sound Control Icon Button (Compact & 100% Clickable!)
           if (heroVideoUrl.isNotEmpty)
-            Positioned(
+            const Positioned(
               bottom: 25,
               right: 25,
-              child: Obx(() {
-                final isMuted = controller.isVideoMuted.value;
-                return Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(30),
-                    onTap: () {
-                      controller.toggleVideoMute();
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.85),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: isMuted ? Colors.white38 : PortfolioTheme.accent,
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (isMuted ? Colors.black : PortfolioTheme.accent).withOpacity(0.5),
-                            blurRadius: 12,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
-                            color: isMuted ? Colors.grey[300] : PortfolioTheme.accent,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            isMuted ? "Sound Off (Tap for Audio 🔊)" : "Sound On 🔊",
-                            style: GoogleFonts.outfit(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }),
+              child: _SoundToggleButton(),
             ),
         ],
       );
@@ -341,6 +291,7 @@ class _HeroTextContent extends StatelessWidget {
               isPrimary: false,
               onPressed: () => _launchUrl(cvUrl),
             ),
+            const _SoundToggleButton(),
           ],
         ),
         const SizedBox(height: 40),
@@ -882,6 +833,54 @@ class CyberOrbPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CyberOrbPainter oldDelegate) {
     return oldDelegate.rotationValue != rotationValue;
+  }
+}
+
+class _SoundToggleButton extends StatelessWidget {
+  const _SoundToggleButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<PortfolioController>();
+    return Obx(() {
+      final isMuted = controller.isVideoMuted.value;
+      return Tooltip(
+        message: isMuted ? "Sound Off - Tap for Audio 🔊" : "Sound On 🔊 - Tap to Mute",
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(30),
+            onTap: () {
+              controller.toggleVideoMute();
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isMuted ? Colors.black.withOpacity(0.75) : PortfolioTheme.accent.withOpacity(0.25),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isMuted ? Colors.white38 : PortfolioTheme.accent,
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (isMuted ? Colors.black : PortfolioTheme.accent).withOpacity(0.5),
+                    blurRadius: 12,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: Icon(
+                isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                color: isMuted ? Colors.grey[300] : PortfolioTheme.accent,
+                size: 22,
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 
