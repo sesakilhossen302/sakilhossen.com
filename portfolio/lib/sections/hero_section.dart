@@ -929,12 +929,18 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
   void _videoListener() {
     if (_controller == null || !_controller!.value.isInitialized || _isTransitioning) return;
     
-    final position = _controller!.value.position;
-    final duration = _controller!.value.duration;
+    final value = _controller!.value;
+    final position = value.position;
+    final duration = value.duration;
 
-    if (duration.inMilliseconds > 0 && position >= duration) {
-      _isTransitioning = true;
-      _advanceNextVideo();
+    if (duration > Duration.zero) {
+      final isNearEnd = (duration.inMilliseconds - position.inMilliseconds) <= 600;
+      final hasCompleted = !value.isPlaying && position >= (duration - const Duration(milliseconds: 1000));
+
+      if (isNearEnd || hasCompleted) {
+        _isTransitioning = true;
+        _advanceNextVideo();
+      }
     }
   }
 
@@ -947,10 +953,12 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
   }
 
   void _disposeVideo() {
-    _controller?.removeListener(_videoListener);
-    _controller?.pause();
-    _controller?.dispose();
-    _controller = null;
+    if (_controller != null) {
+      _controller!.removeListener(_videoListener);
+      _controller!.pause();
+      _controller!.dispose();
+      _controller = null;
+    }
     _isInitialized = false;
   }
 
