@@ -130,61 +130,58 @@ class AdminSidebar extends StatelessWidget {
                 final item = menuItems[index];
                 final isSelected = selectedIndex == index;
 
-                return Obx(() {
-                  int badgeCount = 0;
-                  if (item['badgeKey'] == 'inbox') {
-                    badgeCount = adminController.inboxMessages.length;
-                  }
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 4),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          onTabSelected(index);
-                          if (isDrawer) {
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? PortfolioTheme.primary.withOpacity(isDark ? 0.2 : 0.1)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected ? PortfolioTheme.primary : Colors.transparent,
-                              width: 1,
-                            ),
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 4),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        onTabSelected(index);
+                        if (isDrawer) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? PortfolioTheme.primary.withOpacity(isDark ? 0.2 : 0.1)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? PortfolioTheme.primary : Colors.transparent,
+                            width: 1,
                           ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                item['icon'] as IconData,
-                                size: 18,
-                                color: isSelected
-                                    ? PortfolioTheme.primary
-                                    : (isDark ? Colors.white70 : Colors.black54),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  item['label'] as String,
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 13,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                    color: isSelected
-                                        ? PortfolioTheme.primary
-                                        : (isDark ? Colors.white : PortfolioTheme.secondary),
-                                  ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              item['icon'] as IconData,
+                              size: 18,
+                              color: isSelected
+                                  ? PortfolioTheme.primary
+                                  : (isDark ? Colors.white70 : Colors.black54),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                item['label'] as String,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  color: isSelected
+                                      ? PortfolioTheme.primary
+                                      : (isDark ? Colors.white : PortfolioTheme.secondary),
                                 ),
                               ),
-                              if (badgeCount > 0)
-                                Container(
+                            ),
+                            if (item['badgeKey'] == 'inbox')
+                              Obx(() {
+                                final badgeCount = adminController.inboxMessages.length;
+                                if (badgeCount == 0) return const SizedBox.shrink();
+                                return Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFEF4444),
@@ -198,14 +195,14 @@ class AdminSidebar extends StatelessWidget {
                                       color: Colors.white,
                                     ),
                                   ),
-                                ),
-                            ],
-                          ),
+                                );
+                              }),
+                          ],
                         ),
                       ),
                     ),
-                  );
-                });
+                  ),
+                );
               },
             ),
           ),
