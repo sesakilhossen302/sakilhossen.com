@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/portfolio_controller.dart';
@@ -31,33 +32,7 @@ class HomeScreen extends StatelessWidget {
       final showFab = controller.activeSectionIndex.value > 0;
 
       if (controller.isLoading.value && controller.profile.value == null) {
-        return Scaffold(
-          backgroundColor: isDark ? PortfolioTheme.bgDark : PortfolioTheme.bgLight,
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(PortfolioTheme.primary),
-                    strokeWidth: 3,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  "Loading Portfolio...",
-                  style: GoogleFonts.outfit(
-                    fontSize: 16,
-                    color: isDark ? Colors.white70 : PortfolioTheme.secondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+        return _FuturisticCyberLoader(isDark: isDark);
       }
 
       return Scaffold(
@@ -173,5 +148,140 @@ class HomeScreen extends StatelessWidget {
         ),
       );
     });
+  }
+}
+
+class _FuturisticCyberLoader extends StatefulWidget {
+  final bool isDark;
+
+  const _FuturisticCyberLoader({required this.isDark});
+
+  @override
+  State<_FuturisticCyberLoader> createState() => _FuturisticCyberLoaderState();
+}
+
+class _FuturisticCyberLoaderState extends State<_FuturisticCyberLoader>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bgColor = widget.isDark ? PortfolioTheme.bgDark : PortfolioTheme.bgLight;
+
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: Center(
+        child: AnimatedBuilder(
+          animation: _animController,
+          builder: (context, child) {
+            final rotation = _animController.value * 2 * math.pi;
+            final pulse = 0.85 + 0.15 * math.sin(_animController.value * 2 * math.pi);
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Glowing Cyber Orb Loader
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Outer Glowing Rotating Ring
+                    Transform.rotate(
+                      angle: rotation,
+                      child: Container(
+                        width: 90,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: SweepGradient(
+                            colors: [
+                              PortfolioTheme.primary.withOpacity(0.0),
+                              PortfolioTheme.accent,
+                              PortfolioTheme.primary,
+                            ],
+                            stops: const [0.0, 0.5, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Inner Masking Circle
+                    Container(
+                      width: 82,
+                      height: 82,
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    // Pulsing Neon Center Icon
+                    Transform.scale(
+                      scale: pulse,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: PortfolioTheme.primary.withOpacity(0.15),
+                          border: Border.all(
+                            color: PortfolioTheme.accent,
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: PortfolioTheme.accent.withOpacity(0.5),
+                              blurRadius: 16,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.code_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+                // Glowing Loading Status Text
+                Text(
+                  "LOADING PORTFOLIO...",
+                  style: GoogleFonts.outfit(
+                    fontSize: 15,
+                    color: widget.isDark ? Colors.white70 : PortfolioTheme.secondary,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 2.0,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Fetching Dynamic MongoDB Atlas Data",
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: PortfolioTheme.accent.withOpacity(0.8),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 }
