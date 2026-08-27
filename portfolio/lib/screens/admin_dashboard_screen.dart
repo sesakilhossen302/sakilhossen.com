@@ -45,7 +45,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       }
 
       final isDark = portfolioController.isDarkMode.value;
-      final isDesktop = MediaQuery.of(context).size.width >= 900;
+      final isDesktop = MediaQuery.of(context).size.width >= 768;
 
       final tabViews = [
         AdminInboxTab(isDark: isDark),

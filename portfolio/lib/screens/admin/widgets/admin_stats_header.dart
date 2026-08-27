@@ -47,7 +47,7 @@ class AdminStatsHeader extends StatelessWidget {
               icon: Icons.folder_copy_outlined,
               color: const Color(0xFF3B82F6),
               isDark: isDark,
-              onTap: () => onTabSelected(2),
+              onTap: () => onTabSelected(6),
             ),
             _StatCard(
               title: "Client Reviews",
@@ -56,7 +56,7 @@ class AdminStatsHeader extends StatelessWidget {
               icon: Icons.star_outline_rounded,
               color: const Color(0xFFF59E0B),
               isDark: isDark,
-              onTap: () => onTabSelected(3),
+              onTap: () => onTabSelected(7),
             ),
             _StatCard(
               title: "Live Status",
