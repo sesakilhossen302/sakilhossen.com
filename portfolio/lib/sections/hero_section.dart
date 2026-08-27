@@ -839,6 +839,7 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
   List<String> _videoPlaylist = [];
   int _currentVideoIndex = 0;
   bool _isTransitioning = false;
+  bool _isMuted = true;
 
   @override
   void initState() {
@@ -903,7 +904,7 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
     try {
       final uri = Uri.parse(targetUrl);
       _controller = VideoPlayerController.networkUrl(uri)
-        ..setVolume(0.0);
+        ..setVolume(_isMuted ? 0.0 : 1.0);
 
       await _controller!.initialize();
 
@@ -974,14 +975,75 @@ class _BackgroundVideoPlayerState extends State<_BackgroundVideoPlayer> {
       return const SizedBox.shrink();
     }
 
-    return FittedBox(
-      fit: BoxFit.cover,
-      clipBehavior: Clip.hardEdge,
-      child: SizedBox(
-        width: _controller!.value.size.width,
-        height: _controller!.value.size.height,
-        child: VideoPlayer(_controller!),
-      ),
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: FittedBox(
+            fit: BoxFit.cover,
+            clipBehavior: Clip.hardEdge,
+            child: SizedBox(
+              width: _controller!.value.size.width,
+              height: _controller!.value.size.height,
+              child: VideoPlayer(_controller!),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 25,
+          right: 25,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(30),
+              onTap: () {
+                setState(() {
+                  _isMuted = !_isMuted;
+                  _controller?.setVolume(_isMuted ? 0.0 : 1.0);
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.75),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: _isMuted ? Colors.white38 : PortfolioTheme.accent,
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: (_isMuted ? Colors.black : PortfolioTheme.accent).withOpacity(0.4),
+                      blurRadius: 12,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                      color: _isMuted ? Colors.grey[300] : PortfolioTheme.accent,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _isMuted ? "Sound Off (Tap for Audio 🔊)" : "Sound On 🔊",
+                      style: GoogleFonts.outfit(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
