@@ -75,7 +75,7 @@ class ReferencesSection extends StatelessWidget {
                     crossAxisCount: crossAxisCount,
                     crossAxisSpacing: 24,
                     mainAxisSpacing: 24,
-                    mainAxisExtent: 220, // fixed height for review cards
+                    mainAxisExtent: 270, // Height allowing review screenshot proof preview
                   ),
                   itemBuilder: (context, index) {
                     final ref = referencesList[index];
@@ -125,14 +125,84 @@ class _TestimonialCard extends StatefulWidget {
 class _TestimonialCardState extends State<_TestimonialCard> {
   bool _isHovered = false;
 
+  void _showProofDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          decoration: BoxDecoration(
+            color: widget.isDark ? const Color(0xFF0F172A) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: widget.isDark ? PortfolioTheme.borderDark : PortfolioTheme.borderLight,
+              width: 1.5,
+            ),
+            boxShadow: PortfolioTheme.premiumShadow(widget.isDark),
+          ),
+          padding: const EdgeInsets.all(20),
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
+            maxWidth: 700,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.verified_rounded, color: Color(0xFF10B981), size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        "${widget.name}'s Review Screenshot Proof",
+                        style: GoogleFonts.outfit(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: widget.isDark ? Colors.white : PortfolioTheme.secondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close_rounded, color: widget.isDark ? Colors.white70 : PortfolioTheme.secondary),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SingleChildScrollView(
+                    child: PortfolioImage(
+                      imageSource: widget.reviewImage,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final hasProof = widget.reviewImage.trim().isNotEmpty;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: widget.isDark
               ? (_isHovered 
@@ -162,7 +232,7 @@ class _TestimonialCardState extends State<_TestimonialCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // 1. Comment / Testimonial text
+            // 1. Comment text
             Expanded(
               child: Text(
                 '"${widget.comment}"',
@@ -172,19 +242,85 @@ class _TestimonialCardState extends State<_TestimonialCard> {
                   color: widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
                   height: 1.45,
                 ),
-                maxLines: 4,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(height: 16),
-            
-            // 2. Client Profile Details Row
+            const SizedBox(height: 10),
+
+            // 2. Review Proof Screenshot Bar (if available)
+            if (hasProof) ...[
+              InkWell(
+                onTap: () => _showProofDialog(context),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: widget.isDark ? const Color(0x1AFFFFFF) : Colors.black.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: PortfolioTheme.primary.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: SizedBox(
+                          width: 44,
+                          height: 32,
+                          child: PortfolioImage(
+                            imageSource: widget.reviewImage,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.verified_rounded, color: Color(0xFF10B981), size: 13),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "Review Proof Screenshot",
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: widget.isDark ? Colors.white : PortfolioTheme.secondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              "Click to zoom full image 🔍",
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                color: PortfolioTheme.accent,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.zoom_in_rounded, size: 18, color: PortfolioTheme.accent),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+
+            // 3. Client Profile Details Row
             Row(
               children: [
-                // Avatar image (decodes base64/network/asset)
+                // Avatar image
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -199,8 +335,8 @@ class _TestimonialCardState extends State<_TestimonialCard> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                
+                const SizedBox(width: 12),
+
                 // Name & company
                 Expanded(
                   child: Column(
@@ -226,95 +362,19 @@ class _TestimonialCardState extends State<_TestimonialCard> {
                     ],
                   ),
                 ),
-                
+
                 // Rating stars
                 Row(
-                  children: [
-                    Row(
-                      children: List.generate(5, (index) {
-                        final starVal = index + 1;
-                        if (widget.rating >= starVal) {
-                          return const Icon(Icons.star_rounded, color: Colors.amber, size: 16);
-                        } else if (widget.rating >= starVal - 0.5) {
-                          return const Icon(Icons.star_half_rounded, color: Colors.amber, size: 16);
-                        } else {
-                          return Icon(Icons.star_border_rounded, color: Colors.grey.shade400, size: 16);
-                        }
-                      }),
-                    ),
-                    if (widget.reviewImage.isNotEmpty) ...[
-                      const SizedBox(width: 8),
-                      Tooltip(
-                        message: "View Fiverr Review Proof",
-                        child: InkWell(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => Dialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: widget.isDark
-                                        ? const Color(0xFF0F172A)
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  padding: const EdgeInsets.all(16),
-                                  constraints: BoxConstraints(
-                                    maxHeight: MediaQuery.of(context).size.height * 0.8,
-                                    maxWidth: 600,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            "Fiverr Review Proof",
-                                            style: GoogleFonts.outfit(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: widget.isDark
-                                                  ? Colors.white
-                                                  : PortfolioTheme.secondary,
-                                            ),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.close_rounded),
-                                            onPressed: () => Navigator.pop(context),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Expanded(
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(8),
-                                          child: SingleChildScrollView(
-                                            child: PortfolioImage(
-                                              imageSource: widget.reviewImage,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          child: const Icon(
-                            Icons.verified_rounded,
-                            color: Colors.green,
-                            size: 18,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
+                  children: List.generate(5, (index) {
+                    final starVal = index + 1;
+                    if (widget.rating >= starVal) {
+                      return const Icon(Icons.star_rounded, color: Colors.amber, size: 15);
+                    } else if (widget.rating >= starVal - 0.5) {
+                      return const Icon(Icons.star_half_rounded, color: Colors.amber, size: 15);
+                    } else {
+                      return Icon(Icons.star_border_rounded, color: Colors.grey.shade400, size: 15);
+                    }
+                  }),
                 ),
               ],
             ),
