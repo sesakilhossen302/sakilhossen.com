@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 
 class IframeVideoPlayer extends StatelessWidget {
   final String embedUrl;
-  const IframeVideoPlayer({super.key, required this.embedUrl});
+  final bool allowInteraction;
+
+  const IframeVideoPlayer({
+    super.key,
+    required this.embedUrl,
+    this.allowInteraction = false,
+  });
 
   @override
   Widget build(BuildContext context) {

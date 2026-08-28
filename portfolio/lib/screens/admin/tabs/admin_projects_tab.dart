@@ -128,6 +128,7 @@ class AdminProjectsTab extends StatelessWidget {
     final titleCtrl = TextEditingController(text: project?.title ?? '');
     final descCtrl = TextEditingController(text: project?.description ?? '');
     final imgCtrl = TextEditingController(text: project?.image ?? '');
+    final videoCtrl = TextEditingController(text: project?.videoUrl ?? '');
     final playCtrl = TextEditingController(text: project?.playStoreUrl ?? '');
     final appCtrl = TextEditingController(text: project?.appStoreUrl ?? '');
     final gitCtrl = TextEditingController(text: project?.githubUrl ?? '');
@@ -187,6 +188,15 @@ class AdminProjectsTab extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: 12),
+                  TextField(
+                    controller: videoCtrl,
+                    decoration: const InputDecoration(
+                      labelText: "Video Link (Google Drive / YouTube / Direct URL)",
+                      hintText: "https://drive.google.com/file/d/.../view",
+                      prefixIcon: Icon(Icons.video_library_rounded),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   TextField(controller: playCtrl, decoration: const InputDecoration(labelText: "Google Play Store Link")),
                   const SizedBox(height: 12),
                   TextField(controller: appCtrl, decoration: const InputDecoration(labelText: "Apple App Store Link")),
@@ -209,6 +219,7 @@ class AdminProjectsTab extends StatelessWidget {
                   title: titleCtrl.text.trim(),
                   description: descCtrl.text.trim(),
                   image: imgCtrl.text.trim(),
+                  videoUrl: videoCtrl.text.trim(),
                   playStoreUrl: playCtrl.text.trim(),
                   appStoreUrl: appCtrl.text.trim(),
                   githubUrl: gitCtrl.text.trim(),

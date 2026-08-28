@@ -3,6 +3,7 @@ class Project {
   final String title;
   final String description;
   final String image;
+  final String? videoUrl;
   final String? playStoreUrl;
   final String? appStoreUrl;
   final String? githubUrl;
@@ -14,6 +15,7 @@ class Project {
     required this.title,
     required this.description,
     required this.image,
+    this.videoUrl,
     this.playStoreUrl,
     this.appStoreUrl,
     this.githubUrl,
@@ -27,6 +29,9 @@ class Project {
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       image: json['image'] ?? '',
+      videoUrl: (json['videoUrl'] == null || json['videoUrl'] == '')
+          ? (json['video'] == null || json['video'] == '' ? null : json['video'])
+          : json['videoUrl'],
       playStoreUrl: json['playStoreUrl'] == '' ? null : json['playStoreUrl'],
       appStoreUrl: json['appStoreUrl'] == '' ? null : json['appStoreUrl'],
       githubUrl: json['githubUrl'] == '' ? null : json['githubUrl'],
@@ -41,6 +46,7 @@ class Project {
       'title': title,
       'description': description,
       'image': image,
+      'videoUrl': videoUrl ?? '',
       'playStoreUrl': playStoreUrl ?? '',
       'appStoreUrl': appStoreUrl ?? '',
       'githubUrl': githubUrl ?? '',

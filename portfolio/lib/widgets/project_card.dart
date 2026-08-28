@@ -71,9 +71,39 @@ class _ProjectCardState extends State<ProjectCard> {
                 child: SizedBox(
                   height: 180,
                   width: double.infinity,
-                  child: PortfolioImage(
-                    imageSource: project.image,
-                    fit: BoxFit.cover,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: PortfolioImage(
+                          imageSource: project.image,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      if (project.videoUrl != null && project.videoUrl!.trim().isNotEmpty)
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.75),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: PortfolioTheme.primary.withOpacity(0.6), width: 1),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.play_circle_fill_rounded, color: PortfolioTheme.primary, size: 14),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "Video",
+                                  style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),

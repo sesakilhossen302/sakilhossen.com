@@ -5,7 +5,13 @@ import 'package:flutter/material.dart';
 
 class IframeVideoPlayer extends StatefulWidget {
   final String embedUrl;
-  const IframeVideoPlayer({super.key, required this.embedUrl});
+  final bool allowInteraction;
+
+  const IframeVideoPlayer({
+    super.key,
+    required this.embedUrl,
+    this.allowInteraction = false,
+  });
 
   @override
   State<IframeVideoPlayer> createState() => _IframeVideoPlayerState();
@@ -17,7 +23,7 @@ class _IframeVideoPlayerState extends State<IframeVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    _viewId = 'gdrive-iframe-${widget.embedUrl.hashCode}';
+    _viewId = 'iframe-${widget.embedUrl.hashCode}-${widget.allowInteraction}';
     ui_web.platformViewRegistry.registerViewFactory(
       _viewId,
       (int id) {
@@ -26,8 +32,13 @@ class _IframeVideoPlayerState extends State<IframeVideoPlayer> {
           ..style.border = 'none'
           ..style.width = '100%'
           ..style.height = '100%'
-          ..style.pointerEvents = 'none'
-          ..allow = 'autoplay; encrypted-media; fullscreen';
+          ..allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+
+        if (!widget.allowInteraction) {
+          iframe.style.pointerEvents = 'none';
+        } else {
+          iframe.style.pointerEvents = 'auto';
+        }
         return iframe;
       },
     );

@@ -9,6 +9,7 @@ import '../theme/portfolio_theme.dart';
 import '../widgets/project_card.dart';
 import '../widgets/responsive_widget.dart';
 import '../widgets/portfolio_image.dart';
+import '../widgets/iframe_video_player.dart';
 
 class ProjectsSection extends StatelessWidget {
   const ProjectsSection({super.key});
@@ -118,7 +119,7 @@ class ProjectsSection extends StatelessWidget {
   }
 }
 
-class _ProjectDetailsModal extends StatelessWidget {
+class _ProjectDetailsModal extends StatefulWidget {
   final Project project;
   final bool isDark;
 
@@ -126,6 +127,13 @@ class _ProjectDetailsModal extends StatelessWidget {
     required this.project,
     required this.isDark,
   });
+
+  @override
+  State<_ProjectDetailsModal> createState() => _ProjectDetailsModalState();
+}
+
+class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
+  bool _showVideo = false;
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
@@ -136,12 +144,39 @@ class _ProjectDetailsModal extends StatelessWidget {
     }
   }
 
+  String _getEmbedUrl(String rawUrl) {
+    final url = rawUrl.trim();
+    if (url.isEmpty) return '';
+
+    if (url.contains('drive.google.com')) {
+      final regExp = RegExp(r'/(?:file/d/|open\?id=)([a-zA-Z0-9_-]+)');
+      final match = regExp.firstMatch(url);
+      if (match != null && match.group(1) != null) {
+        return 'https://drive.google.com/file/d/${match.group(1)}/preview';
+      }
+    }
+
+    if (url.contains('youtube.com') || url.contains('youtu.be')) {
+      if (url.contains('youtu.be/')) {
+        final id = url.split('youtu.be/').last.split('?').first;
+        return 'https://www.youtube.com/embed/$id';
+      } else if (url.contains('watch?v=')) {
+        final id = url.split('watch?v=').last.split('&').first;
+        return 'https://www.youtube.com/embed/$id';
+      }
+    }
+
+    return url;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final project = widget.project;
+    final isDark = widget.isDark;
     final size = MediaQuery.of(context).size;
     final isMobile = ResponsiveWidget.isMobile(context);
 
-    // Conditional indicators
+    final bool hasVideo = project.videoUrl != null && project.videoUrl!.trim().isNotEmpty;
     final bool hasPlayStore = project.playStoreUrl != null && project.playStoreUrl!.trim().isNotEmpty;
     final bool hasAppStore = project.appStoreUrl != null && project.appStoreUrl!.trim().isNotEmpty;
     final bool hasGitHub = project.githubUrl != null && project.githubUrl!.trim().isNotEmpty;
@@ -166,7 +201,7 @@ class _ProjectDetailsModal extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Close button floating or header
+              // Close button header
               Container(
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.all(12),
@@ -182,9 +217,9 @@ class _ProjectDetailsModal extends StatelessWidget {
                   mobile: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildImageWidget(),
+                      _buildMediaWidget(hasVideo),
                       const SizedBox(height: 24),
-                      _buildTextContent(context, hasPlayStore, hasAppStore, hasGitHub),
+                      _buildTextContent(context, hasVideo, hasPlayStore, hasAppStore, hasGitHub),
                     ],
                   ),
                   desktop: Row(
@@ -192,12 +227,12 @@ class _ProjectDetailsModal extends StatelessWidget {
                     children: [
                       Expanded(
                         flex: 5,
-                        child: _buildImageWidget(),
+                        child: _buildMediaWidget(hasVideo),
                       ),
                       const SizedBox(width: 32),
                       Expanded(
                         flex: 6,
-                        child: _buildTextContent(context, hasPlayStore, hasAppStore, hasGitHub),
+                        child: _buildTextContent(context, hasVideo, hasPlayStore, hasAppStore, hasGitHub),
                       ),
                     ],
                   ),
@@ -210,26 +245,151 @@ class _ProjectDetailsModal extends StatelessWidget {
     );
   }
 
-  Widget _buildImageWidget() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? PortfolioTheme.borderDark : PortfolioTheme.borderLight,
-          width: 1.2,
+  Widget _buildMediaWidget(bool hasVideo) {
+    final project = widget.project;
+    final isDark = widget.isDark;
+
+    return Column(
+      children: [
+        if (hasVideo) ...[
+          // Tab switcher for Image vs Video
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0x1AFFFFFF) : Colors.black.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? PortfolioTheme.borderDark : PortfolioTheme.borderLight,
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () => setState(() => _showVideo = false),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: !_showVideo ? PortfolioTheme.primary : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.image_rounded, size: 16, color: !_showVideo ? Colors.white : (isDark ? Colors.white70 : Colors.black87)),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Image",
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: !_showVideo ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => setState(() => _showVideo = true),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: _showVideo ? PortfolioTheme.primary : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.play_circle_fill_rounded, size: 16, color: _showVideo ? Colors.white : (isDark ? Colors.white70 : Colors.black87)),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Watch Video",
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: _showVideo ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // Media Container
+        Container(
+          height: 250,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? PortfolioTheme.borderDark : PortfolioTheme.borderLight,
+              width: 1.2,
+            ),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: _showVideo && hasVideo
+                ? Stack(
+                    children: [
+                      Positioned.fill(
+                        child: IframeVideoPlayer(
+                          embedUrl: _getEmbedUrl(project.videoUrl!),
+                          allowInteraction: true,
+                        ),
+                      ),
+                    ],
+                  )
+                : Stack(
+                    children: [
+                      Positioned.fill(
+                        child: PortfolioImage(
+                          imageSource: project.image,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      if (hasVideo)
+                        Positioned.fill(
+                          child: Container(
+                            color: Colors.black26,
+                            child: Center(
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: PortfolioTheme.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                ),
+                                onPressed: () => setState(() => _showVideo = true),
+                                icon: const Icon(Icons.play_arrow_rounded, size: 22),
+                                label: const Text("Watch Video Demo"),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+          ),
         ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: PortfolioImage(
-          imageSource: project.image,
-          fit: BoxFit.cover,
-        ),
-      ),
+      ],
     );
   }
 
-  Widget _buildTextContent(BuildContext context, bool hasPlayStore, bool hasAppStore, bool hasGitHub) {
+  Widget _buildTextContent(BuildContext context, bool hasVideo, bool hasPlayStore, bool hasAppStore, bool hasGitHub) {
+    final project = widget.project;
+    final isDark = widget.isDark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -326,9 +486,9 @@ class _ProjectDetailsModal extends StatelessWidget {
         ],
         
         // Conditional Render of Buttons
-        if (hasPlayStore || hasAppStore || hasGitHub) ...[
+        if (hasVideo || hasPlayStore || hasAppStore || hasGitHub) ...[
           Text(
-            "Links & Downloads",
+            "Links & Media",
             style: GoogleFonts.outfit(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -340,6 +500,14 @@ class _ProjectDetailsModal extends StatelessWidget {
             spacing: 12,
             runSpacing: 12,
             children: [
+              // Watch Video Link
+              if (hasVideo)
+                _buildLinkButton(
+                  label: "Open Video Link",
+                  icon: Icons.open_in_new_rounded,
+                  color: const Color(0xFFEA4335), // Red / Drive / Video
+                  onPressed: () => _launchUrl(project.videoUrl!),
+                ),
               // Google Play Store
               if (hasPlayStore)
                 _buildLinkButton(
