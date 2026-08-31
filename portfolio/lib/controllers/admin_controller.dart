@@ -229,7 +229,14 @@ class AdminController extends GetxController {
       ).timeout(const Duration(seconds: 180));
 
       if (response.statusCode == 201) {
-        Get.find<PortfolioController>().fetchPortfolioData();
+        final data = json.decode(response.body);
+        final portfolioCtrl = Get.find<PortfolioController>();
+        if (data['project'] != null) {
+          portfolioCtrl.projects.add(Project.fromJson(data['project']));
+        } else {
+          portfolioCtrl.projects.add(project);
+        }
+        portfolioCtrl.fetchPortfolioData(isSilent: true);
         return true;
       } else {
         print('Add project failed with status ${response.statusCode}: ${response.body}');
@@ -252,7 +259,14 @@ class AdminController extends GetxController {
       ).timeout(const Duration(seconds: 180));
 
       if (response.statusCode == 200) {
-        Get.find<PortfolioController>().fetchPortfolioData();
+        final data = json.decode(response.body);
+        final updated = data['project'] != null ? Project.fromJson(data['project']) : project;
+        final portfolioCtrl = Get.find<PortfolioController>();
+        final idx = portfolioCtrl.projects.indexWhere((p) => p.id == updated.id);
+        if (idx != -1) {
+          portfolioCtrl.projects[idx] = updated;
+        }
+        portfolioCtrl.fetchPortfolioData(isSilent: true);
         return true;
       } else {
         print('Update project failed with status ${response.statusCode}: ${response.body}');
@@ -274,7 +288,9 @@ class AdminController extends GetxController {
       ).timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
-        Get.find<PortfolioController>().fetchPortfolioData();
+        final portfolioCtrl = Get.find<PortfolioController>();
+        portfolioCtrl.projects.removeWhere((p) => p.id == id);
+        portfolioCtrl.fetchPortfolioData(isSilent: true);
         return true;
       }
     } catch (e) {

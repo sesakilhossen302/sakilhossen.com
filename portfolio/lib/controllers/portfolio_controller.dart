@@ -171,7 +171,7 @@ class PortfolioController extends GetxController {
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         final response = await http.get(Uri.parse('$apiHost/portfolio')).timeout(
-          const Duration(seconds: 15), // Extended to 15s to allow Render free tier cold-start
+          const Duration(seconds: 45), // Extended to 45s for large initial payloads & cold starts
         );
 
         if (response.statusCode == 200) {
