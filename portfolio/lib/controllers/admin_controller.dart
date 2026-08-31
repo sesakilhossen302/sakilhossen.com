@@ -226,11 +226,13 @@ class AdminController extends GetxController {
         Uri.parse('$apiHost/projects'),
         headers: headers,
         body: json.encode(project.toJson()),
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 180));
 
       if (response.statusCode == 201) {
         Get.find<PortfolioController>().fetchPortfolioData();
         return true;
+      } else {
+        print('Add project failed with status ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print('Add project error: $e');
@@ -247,11 +249,13 @@ class AdminController extends GetxController {
         Uri.parse('$apiHost/projects/${project.id}'),
         headers: headers,
         body: json.encode(project.toJson()),
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 180));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();
         return true;
+      } else {
+        print('Update project failed with status ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print('Update project error: $e');
@@ -267,7 +271,7 @@ class AdminController extends GetxController {
       final response = await http.delete(
         Uri.parse('$apiHost/projects/$id'),
         headers: headers,
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         Get.find<PortfolioController>().fetchPortfolioData();

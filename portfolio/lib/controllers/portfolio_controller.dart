@@ -44,8 +44,8 @@ class PortfolioController extends GetxController {
     _initializeData();
     // Monitor scroll changes to update active section index
     scrollController.addListener(_onScroll);
-    // Poll backend every 5 seconds for fast updates
-    _pollingTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+    // Poll backend every 30 seconds for background sync (real-time updates driven by SSE)
+    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       fetchPortfolioData(isSilent: true);
     });
     // Establish real-time SSE listener for 0-second multi-device sync
